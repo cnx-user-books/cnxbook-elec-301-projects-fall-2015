@@ -1,0 +1,911 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>GPU Acceleration of Edge-Based Motion Detection and Machine Learning-Aided Facial Recognition with NVIDIA CUDA</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58206</md:content-id>
+  <md:title>GPU Acceleration of Edge-Based Motion Detection and Machine Learning-Aided Facial Recognition with NVIDIA CUDA</md:title>
+  <md:abstract>GPUs provide a powerful platform for parallel computations
+on large data inputs, namely images. In this paper, we
+explore a GPU-based implementation of a simplified adaptation
+of existing edge detection algorithms fast enough to operate
+on frames of a continuous video stream in real-time. We also
+demonstrate a practical application of edge detection–an edge-based
+method for motion detection estimation. Additionally,
+we explore the GPU-CPU speedup of existing OpenCV GPU
+computation libraries, namely, for facial recognition algorithms.
+Finally, we demonstrate the speedups as high as 10x we achieve
+with GPU parallelism, as compared to a reference serial CPU-based
+implementation.</md:abstract>
+  <md:uuid>63ba7b39-f4dc-4976-a073-daf22a1fad23</md:uuid>
+</metadata>
+
+<content>
+  <section id="eip-171">
+<title>Introduction</title>
+<para id="eip-332">Graphics processing units (GPUs) are rapidly gaining popularity
+as a platform for parallelized computations on massive
+sets of data. Since much of the computations in image processing
+and computer vision are easily parallelized, graphics
+operations on GPUs achieve significant speedups compared to
+those done on their serial, CPU counterparts. Further, SDKs
+like the NVIDIA CUDA framework provide developers easy
+APIs to take advantage of the parallel computing power of
+GPUs. We take full advantage of the computational benefits of
+GPUs by implementing edge detection and motion detection
+algorithms in CUDA C, and making use of existing CUDA
+libraries for our facial recognition algorithm.
+In this paper, we first detail the theory for our edge detection,
+motion detection, and facial recognition algorithms in Sections
+II, III, and IV, respectively. At the end of Sections II and III,
+we describe our GPU code implementation of these algorithms
+with NVIDIA CUDA. At the end of Section IV, we comment
+on the performance we achieve with a prebuilt, CUDA-based
+OpenCV GPU computation library, as opposed to that we
+achieve with a custom CUDA implementation as in Sections
+II and III. We present speedup results achieved with our
+CUDA implementation with respect to a reference serial, CPU
+implmentation in Section V. Finally, we conclude in Section
+VI.
+</para>
+<section id="eip-837"><title>GPU Computation and the NVIDIA CUDA Framework</title><para id="eip-167">
+Formally, CUDA (Compute Unified Device Architecture) is
+a parallel computing platform and programming model that
+exposes familiar C-based APIs for parallelized computations.
+CUDA is NVIDIA’s platform for general-purpose computing
+on graphics processing units (commonly, GPGPU or GP2U),
+or the use of a GPU for computations traditionally handled by
+the CPU. Generally, GPGPU is used to exploit the improved
+multithreaded performance and raw floating-point computational
+ability of GPUs over CPUs. For example, on modern
+hardware, an NVIDIA GeForce GTX 970 (1664 CUDA cores)
+exhibits peak single-precision floating point performance of
+nearly 3500 GFLOPS (floating-point operations per second),
+while an Intel Core i7 4790K (4C, 8T) achieves 100 GFLOPS.
+Our goal is to demonstrate the performance of GPU computing
+by solving a handful of existing problems in computer vision
+with CUDA: namely, edge detection, motion detection, and
+facial recognition.
+</para></section>
+<section id="eip-577"><title>OpenCV and Python</title><para id="eip-922">
+While CUDA is an excellent language for maximizing
+performance, it could be infeasible due to inexperience with C,
+time constraints, or lack of an NVIDIA GPU. To address these
+constraints, we also implemented our algorithms in Python
+using the Python OpenCV library. We chose Python because
+it is very easy for inexperienced programmers to use, and we
+chose OpenCV because it offers implementations of many
+common image processing algorithms. Unfortunately, using
+OpenCV limits us to the library’s implementation, which does
+not currently support the use of GPU parallelization in Python
+without using C wrappers. For each of the algorithms in this
+paper, we present code snippets that provide a sample CPUbased
+Python implementation alongside a GPU-based parallel
+CUDA implementation.</para></section>
+<section id="eip-690"><title>Motivation</title><para id="eip-48">
+GPU parallelization is a powerful tool for accelerating image
+processing tasks. The motivation for our CUDA motion detection
+and facial recognition algorithms stems from their diverse
+applications and the ease of coding a GPU implementation,
+which is due in large part to the simplicity of CUDA APIs and
+OpenCV libraries. For example, motion detection is applied in
+real-time traffic analysis, vision-based security, and consumer
+technology (e.g. motion-triggered home automation solutions).
+Further, since our computer vision algorithm calculates the
+location of motion in a frame based on detected edges, our
+2
+approach is both more accurate and supplemented with more
+specific data. Facial recognition is applied in real-time security,
+smart photographic analysis, and military purposes, including
+target-based missile guiding systems. Therefore, we view an
+opportunity use CUDA to explore the speedup possible by
+using a GPU to accelerate these common tasks in computer
+vision.
+</para></section>
+</section>
+<section id="eip-84"><title>Edge Detection Algorithm</title><para id="eip-243">Edge detection is the process of determining the locations
+of boundaries that separate objects, or sections of objects, in
+an image. This edge data simplifies the features of an image
+to only its basic outlines, which makes it a convenient input
+for many other problems in computer vision, including motion
+detection and tracking, object classification, three-dimensional
+reconstruction, and others. The edge detection algorithm we
+present is composed of three stages:</para><list id="eip-200" list-type="enumerated" number-style="arabic"><item>Reduce the amount of high-frequency noise from the
+image using a two-dimensional low pass filter.</item>
+<item>Determine the two-dimensional gradient of the filtered
+image by applying partial derivatives in both the horizontal
+and vertical directions.</item>
+<item>Classify edges by suppressing surrounding pixels in the
+gradient direction whose magnitude is lesser, and applying
+selective thresholding to a limited apron around
+each selected pixel.</item></list><para id="eip-298">Edges correspond to the points on the image that exhibit a
+high gradient magnitude. The edge data from our algorithm is
+then used as input to our motion detection algorithm.</para><para id="eip-724"><title>Fig. 1. High-level block diagram describing our implementation of a real-time edge-based motion detector</title><media id="fig1" alt="High-level block diagram of motion detection system">	   
+  <image mime-type="image/png" src="../../media/fig1.png"/>	 
+</media></para><section id="eip-488"><title>Separable Convolution</title><para id="eip-722">
+The filtering necessary in steps (1) and (2) from our algorithm
+above involve the convolution of a two-dimensional
+image and a two-dimensional kernel filter of constant width
+and height. A na¨ıve implementation of two-dimensional convolution
+would require a double sum across the kernel and
+image for each individual pixel:
+</para><para id="eip-365"><media id="eq1" alt="2D Convolution Equation">	   
+  <image mime-type="image/jpeg" src="../../media/equation1.JPG"/>	 
+</media></para><para id="eip-155">For an image of size M x N and kernel of size k, a direct
+implementation would require O(MNk^2) time, which is infeasible
+for a real-time implementation. Instead, it is possible to
+exploit the separable property of certain convolution matrices
+h, e.g. that h can be represented as the product of two onedimensional
+matrices h1 and h2. This effectively reduces our
+two-dimensional convolution of Equation (1) to two separate
+instances of one-dimensional convolution:</para><para id="eip-236"><media id="eq2" alt="Separable Convolution">	   
+  <image mime-type="image/jpeg" src="../../media/eq2.JPG"/>	 
+</media></para><para id="eip-149">which is implemented as</para><para id="eip-72"><media id="eq3" alt="Separable Convolution Equation">	   
+  <image mime-type="image/jpeg" src="../../media/eq3.JPG"/>	 
+</media></para><para id="eip-746"><media id="fig2" alt="Execution times of direct and separable 2D Convolution">	   
+  <image mime-type="image/jpeg" src="../../media/fig2-1382.jpg"/>	 
+</media></para><para id="eip-45">For the same M x N input and square kernel of size k, a
+separable implementation reduces the computational complexity
+to O(MNk). By comparison, an implementation using
+the FFT would cost O(MN logMN). In practice, consider
+the separable convolution speed gain evident in the following
+results for a convolution of a 3 x 3 Gaussian filter kernel with
+images of varying sizes (visualized in Figure 2).</para><para id="eip-969"><media id="table1" alt="Execution Time of Direct 2D Convolution">	   
+  <image mime-type="image/jpeg" src="../../media/table1.JPG"/>	 
+</media></para><para id="eip-140"><media id="table2" alt="Execution Time of Separable 2D Convolution">	   
+  <image mime-type="image/jpeg" src="../../media/table2.JPG"/>	 
+</media></para><para id="eip-716">As detailed in later sections, we take advantage of the
+fast computational complexity of separable convolution in our
+implementation, as all of the filters we apply are separable into
+one-dimensional matrices.</para></section><section id="eip-130"><title>Noise Elimination: Two-Dimensional Gaussian Filtering</title><para id="eip-132">
+The first task in our edge detection algorithm is denoising
+the input in order to reduce the amount of high-frequency
+content in the image by as much as possible without destroying
+critical information points in the image (e.g. the real edges).
+We filter out high-frequency noise so that random noise is
+not mistakenly interpreted as an edge, as edges correspond to
+points in the image where the gradient has an above-threshold
+magnitude.
+</para><para id="eip-862">For example, consider the 5312 x 2988 pixel image (taken
+at a high ISO to deliberately introduce noise) of Figure 3
+and a plot of its grayscale intensity versus the image’s spatial
+dimensions in Figure 4. It is clear from the mesh that there
+is much high-frequency noise, which can be removed with a
+low-pass filter.</para><para id="eip-973"><title>Fig. 3. Unfiltered noisy image</title><media id="fig3" alt="noisy image">	   
+  <image mime-type="image/jpeg" src="../../media/fig3-c36f.jpg"/>	 
+</media></para><para id="eip-541"><title>Fig. 4 Grayscale intensity of unfiltered noisy image at each pixel</title><media id="fig4" alt="noisy image intensity plot">	   
+  <image mime-type="image/jpeg" src="../../media/fig4.jpg"/>	 
+</media></para><para id="eip-824"><title>Fig. 5. FFT magnitude of unfiltered noisy image (log scale)</title><media id="fig5" alt="FFT magnitude of unfiltered noisy image (log scale)">	   
+  <image mime-type="image/jpeg" src="../../media/fig5.jpg"/>	 
+</media></para><para id="eip-539">To low-pass filter our image, we apply a discrete Gaussian
+filter. Generally, a Gaussian blur kernel of size 2n+1 x 2n+1
+(where n is a positive integer, and with parameter sigma) is given by</para><para id="eip-161"><media id="other1" alt="equation for Gaussian kernel">	   
+  <image mime-type="image/jpeg" src="../../media/other1.JPG"/>	 
+</media></para><para id="eip-189">Our implementation of Gaussian filtering uses the constantsized
+(k = 3), constant-sigma kernel</para><para id="eip-613"><media id="other2" alt="Gaussian kernel">	   
+  <image mime-type="image/jpeg" src="../../media/other2.JPG"/>	 
+</media></para><para id="eip-931">This kernel is implemented separably as</para><para id="eip-624"><media id="eq4" alt="Separable Gaussian Kernel">	   
+  <image mime-type="image/jpeg" src="../../media/eq4.JPG"/>	 
+</media></para><para id="eip-164">Applying a Gaussian filter with parameters k = 5 and sigma = 5
+to the above image significantly denoises the image without
+sacrificing edge precision, which can be seen from the spatial
+intensity plot in Figure 7.</para><para id="eip-601"><title>Fig. 6. Gaussian-filtered noisy image</title><media id="fig6" alt="Gaussian-filtered noisy image">	   
+  <image mime-type="image/jpeg" src="../../media/fig6.jpg"/>	 
+</media></para><para id="eip-668"><title>Fig. 7. Grayscale intensity of Gaussian-filtered noisy image</title><media id="fig7" alt="Grayscale intensity of Gaussian-filtered noisy image">	   
+  <image mime-type="image/jpeg" src="../../media/fig7.jpg"/>	 
+</media></para><para id="eip-273"><title>Fig. 8. FFT magnitude of Gaussian-filtered noisy image</title><media id="fig8" alt="FFT magnitude of Gaussian-filtered noisy image">	   
+  <image mime-type="image/jpeg" src="../../media/fig8.jpg"/>	 
+</media></para></section><section id="eip-902"><title>Gradient Computation: The Sobel Operator</title><para id="eip-191">
+Edges in the image correspond to pixel locations at which
+there is a rapid change in intensity with respect to the image’s
+spatial dimensions. Thus, edge pixels are defined as
+those whose gradient magnitude |G| is maximized along the
+gradient direction ThetaG.
+</para><para id="eip-606"><media id="eq5" alt="equations 5 and 6">	   
+  <image mime-type="image/jpeg" src="../../media/eq5.JPG"/>	 
+</media></para><para id="eip-896">where Gx and Gy are the values of the partial derivatives along
+the x and y directions, respectively, at the pixel located at (i, j)
+of the image A.</para><para id="eip-858"><media id="other3" alt="Gx and Gy">	   
+  <image mime-type="image/jpeg" src="../../media/other3.JPG"/>	 
+</media></para><para id="eip-145">A variety of different discrete differentiation operators exist
+to approximate the gradient of the image. The operator we
+choose in our implementation is the Sobel operator.</para><para id="eip-885"><media id="other4" alt="Gx and Gy">	   
+  <image mime-type="image/jpeg" src="../../media/other4.JPG"/>	 
+</media></para><para id="eip-967">Like our Gaussian kernel, the Sobel operator (in both the x
+and y directions) is separable:</para><para id="eip-363"><media id="eq7" alt="Gx and Gy Separable">	   
+  <image mime-type="image/jpeg" src="../../media/eq7.JPG"/>	 
+</media></para><para id="eip-50">Thus, we perform two separable convolutions with the
+separated Sobel filter on the Gaussian-filtered image to obtain
+gradients in the horizontal and vertical directions, and
+determine the magnitude and angle matrices G and Theta from
+equations (5) and (6).</para></section><section id="eip-146"><title>Non-Maximum Suppression and Selective Thresholding</title><para id="eip-477">
+Given the gradient magnitude and direction of the Gaussianfiltered
+image, the final step of the edge detection algorithm is
+to determine which pixels should be selected as edge pixels,
+and which should be rejected. We define two procedures, nonmaximum
+suppression and selective thresholding, to gain a
+reasonably accurate edge map from the gradient.
+Non-maximum suppression selects and rejects edge pixels
+according to the following criteria:
+</para><list id="eip-833" list-type="enumerated" number-style="arabic"><item>Pixels whose gradient magnitude is below a userdefined
+low threshold, tl, is immediately rejected</item>
+<item>If the gradient magnitude of a pixel is greater than that
+of the pixels in either direction of the gradient angle
+of that pixel, then the pixel is accepted if its gradient
+magnitude is greater than a user-defined high threshold,
+th</item></list><para id="eip-504">The selective thresholding technique extends on the procedure
+of non-maximum suppression. For any pixel that passes crtiteria
+(2) (maximized, relative to the neighboring pixels, along
+the gradient direction), consider an a x a box around the pixel.
+If any pixel within the box exceeds the low threshold tl, then
+the pixel is accepted. This technique attempts to catch pixels
+that might “connect” ridge pixels identified by criteria (2) but
+fail to satify the criterion themselves, in order to create more
+continuous edge lines.</para><para id="eip-380"><title>Fig. 9. Original image input to Sobel filter</title><media id="fig9" alt="Input to Sobel filter">	   
+  <image mime-type="image/jpeg" src="../../media/fig9.jpg"/>	 
+</media></para><para id="eip-548"><title>Fig. 10. Sobel filter in both x and y applied to blurred image</title><media id="fig10" alt="figure 9 Sobel filtered in x and y directions">	   
+  <image mime-type="image/jpeg" src="../../media/fig10.jpg"/>	 
+</media></para><para id="eip-269"><title>Fig. 11. Gradient of Figure 10 as 3D mesh</title><media id="fig11" alt="Gradient of Figure 10 as 3D mesh">	   
+  <image mime-type="image/jpeg" src="../../media/fig11.jpg"/>	 
+</media></para><para id="eip-627"><title>Fig. 12. Output of edge detection algorithm after non-maximum suppression and selective thresholding on the image of Figure 9, with parameters tl = 70 and th = 80</title><media id="fig12" alt="Output of edge detection algorithm after non-maximum suppression and selective thresholding on the image of Figure 9, with parameters tl = 70 and th = 80">	   
+  <image mime-type="image/jpeg" src="../../media/fig12.jpg"/>	 
+</media></para></section><section id="eip-817"><title>GPU Parallelization and CUDA Implementation</title><para id="eip-231">We begin with a parallelized implementation of separable
+convolution, since the same convolution operation is applied for both the initial Gaussian low pass filter and the edge detecting
+Sobel filter. Our parallel implementation involves first
+independently computing the convolution with the horizontal
+filter (h2 in Equation (2)), then convolving that result with
+the vertical filter h1. In computing the output y[m; n] at every
+index (i, j), we launch a kernel with 16 threads per block,
+where the total number of blocks along one dimension is
+equal to the size of that dimension divided by 16. For our
+5312 x 2988 test images, this corresponds to 332 blocks in the
+horizontal direction and 186 blocks in the vertical direction,
+each with 16 computational threads.
+</para><code id="eip-127" display="block"><title>Listing 1. Grid configuration for the separable convolution device kernel</title>#define TX 16
+#define TY 16
+
+dim3 block_size(TX, TY);
+int bx_horizontal = horizontal_convolution_width/block_size.x;
+int by_horizontal = horizontal_convolution_height/block_size.y;
+dim3 grid_size_horizontal = dim3(bx_horizontal, by_horizontal);
+int bx_vertical = vertical_convolution_width/block_size.x;
+int by_vertical = vertical_convolution_height/block_size.y;
+dim3 grid_size_vertical = dim3(bx_vertical, by_vertical);
+
+horizontal_convolve&lt;&lt;&lt;grid_size_horizontal, block_size&gt;&gt;&gt;(...);
+vertical_convolve&lt;&lt;&lt;grid_size_vertical, block_size&gt;&gt;&gt;(...);</code><para id="eip-301"><title>Algorithm 1 Non-maximum suppression and selective thresholding: pseudocode for a serial, CPU implementation</title><media id="alg1" alt="Non-maximum suppression and selective thresholding: pseudocode for a serial, CPU implementation">	   
+  <image mime-type="image/jpeg" src="../../media/alg1.JPG"/>	 
+</media></para><code id="eip-150" display="block"><title>Listing 2. Implementation of horizontal and vertical separated convolution</title>__global__ void horizontal_convolve(int *d_out, int *x, int *h, int x_width, int x_height, int h_width, int h_height) {
+    const int r = blockIdx.y * blockDim.y + threadIdx.y;
+    const int c = blockIdx.x * blockDim.x + threadIdx.x;
+    const int i = r * (x_width + h_width - 1) + c;
+    
+    int sum = 0;
+    for (int j = 0; j &lt; h_width; j++) {
+        int p = x_width*r + c - j;
+        if (c - j &gt;= 0 &amp;&amp; c - j &lt; x_width) {
+            sum += h[j] * x[p];
+        }
+    }
+    d_out[i] = sum;
+    __syncthreads();
+}
+
+__global__ void vertical_convolve(int *d_out, int *x, int *h, int x_width, int x_height, int h_width, int h_height, double constant_scalar) {
+	const int r = blockIdx.y * blockDim.y + threadIdx.y;
+	const int c = blockIdx.x * blockDim.x + threadIdx.x;
+	const int i = r * x_width + c;
+
+    int sum = 0;
+    for (int j = 0; j &lt; h_height; j++) {
+        int p = x_width*(r - j) + c;
+        if (r - j &gt;= 0 &amp;&amp; r - j &lt; x_height) {
+            sum += h[j] * x[p];
+        }
+    }
+    d_out[i] = (int)(constant_scalar * (double)sum);
+    __syncthreads();
+}</code><code id="eip-520" display="block"><title>Listing 3. GPU computation of gradient magnitude and angle</title>__global__ void gradient_magnitude_and_direction(
+		double *dev_magnitude_output,
+		double *dev_angle_output
+		int input_width,
+		int input_height,
+		int *g_x,
+		int *g_y
+	) {
+	const int r = blockIdx.y * blockDim.y + threadIdx.y;
+	const int c = blockIdx.x * blockDim.x + threadIdx.x;
+	const int i = r * (input_width + 2) + c;
+	
+	dev_magnitude_output[i] = sqrt(pow((double)g_x[i], 2) + pow((double)g_y[i], 2));
+	dev_angle_output[i] = atan2((double)g_y[i], (double)g_x[i]);
+}</code><para id="eip-941">Following completion of the computation of Listing 3, the result
+is input to our implementation of Algorithm 1. While each
+of these two tasks operates in parallel (e.g. that each pixel’s
+magnitude/angle or edge property is computed in parallel with
+the other pixels), the two tasks themselves execute serially.
+This is due to the fact that the non-maximum suppression
+and selective thresholding procedure relies on the gradient and
+angle at each pixel to have already been computed when the
+algorithm begins. Nonetheless, despite the fact that such serial
+separation of tasks reduces redundancies in gradient magnitude/
+angle computations, further optimization is possible to
+reduce the amount of time that any thread is idle (which occurs
+after a particular pixel’s gradient magnitude/angle is computed
+but before its edge property is computed).</para><code id="eip-893" display="block"><title>Listing 4. GPU non-maximum suppression and selective thresholding</title>__global__ void thresholding_and_suppression(
+	int *dev_output,
+	double *dev_magnitude,
+	double *dev_angle,
+	int input_width,
+	int input_height,
+	int *g_x,
+	int *g_y,
+	int high_threshold,
+	int low_threshold
+) {
+	const int r = blockIdx.y * blockDim.y + threadIdx.y;
+	const int c = blockIdx.x * blockDim.x + threadIdx.x;
+    const int i = r * (input_width + 2) + c;
+
+    // First, initialize the current pixel to zero (non-edge)
+    dev_output[i] = 0;
+    // Boundary conditions
+    if (r &gt; 1 &amp;&amp; c &gt; 1 &amp;&amp; r &lt; input_height - 1 &amp;&amp; c &lt; input_width - 1) {
+        double magnitude = dev_magnitude[i];
+        if (magnitude &gt; high_threshold) {
+        	// Non-maximum suppression: determine magnitudes in the surrounding pixel and the gradient direction of the current pixel
+        	double magnitude_above = dev_magnitude[(r - 1) * input_width + c];
+			double magnitude_below = dev_magnitude[(r + 1) * input_width + c];
+			double magnitude_left = dev_magnitude[r * input_width + c - 1];
+			double magnitude_right = dev_magnitude[r * input_width + c + 1];
+			double magnitude_upper_right = dev_magnitude[(r + 1) * input_width + c + 1];
+			double magnitude_upper_left = dev_magnitude[(r + 1) * input_width + c - 1];
+			double magnitude_lower_right = dev_magnitude[(r - 1) * input_width + c + 1];
+			double magnitude_lower_left = dev_magnitude[(r - 1) * input_width + c - 1];
+			double theta = dev_angle[i];
+		
+			// Check if the current pixel is a ridge pixel, e.g. maximized in the gradient direction
+			int vertical_check = (M_PI/3.0 &lt; theta &amp;&amp; theta &lt; 2.0*M_PI/3.0) || (-2.0*M_PI/3.0 &lt; theta &amp;&amp; theta &lt; -M_PI/3.0);
+			int is_vertical_max = vertical_check &amp;&amp; magnitude &gt; magnitude_below &amp;&amp; magnitude &gt; magnitude_above;
+			int horizontal_check = (-M_PI/6.0 &lt; theta &amp;&amp; theta &lt; M_PI/6.0) || (-M_PI &lt; theta &amp;&amp; theta &lt; -5.0*M_PI/6.0) || (5*M_PI/6.0 &lt; theta &amp;&amp; theta &lt; M_PI);
+			int is_horizontal_max = horizontal_check &amp;&amp; magnitude &gt; magnitude_right &amp;&amp; magnitude &gt; magnitude_left;
+	        int positive_diagonal_check = (theta &gt; M_PI/6.0 &amp;&amp; theta &lt; M_PI/3.0) || (theta &lt; -2.0*M_PI/3.0 &amp;&amp; theta &gt; -5.0*M_PI/6.0);
+			int is_positive_diagonal_max = positive_diagonal_check &amp;&amp; magnitude &gt; magnitude_upper_right &amp;&amp; magnitude &gt; magnitude_lower_left;
+			int negative_diagonal_check = (theta &gt; 2.0*M_PI/3.0 &amp;&amp; theta &lt; 5.0*M_PI/6.0) || (theta &lt; -M_PI/6.0 &amp;&amp; theta &gt; -M_PI/3.0);
+			int is_negative_diagonal_max = negative_diagonal_check &amp;&amp; magnitude &gt; magnitude_lower_right &amp;&amp; magnitude &gt; magnitude_upper_left;
+		
+			// Consider a surrounding apron around the current pixel to catch potentially disconnected pixel nodes
+			int apron_size = 2;
+			if (is_vertical_max || is_horizontal_max || is_positive_diagonal_max || is_negative_diagonal_max) {
+				dev_output[i] = 255;
+				for (int m = -apron_size; m &lt;= apron_size; m++) {
+					for (int n = -apron_size; n &lt;= apron_size; n++) {
+						if (r + m &gt; 0 &amp;&amp; r + m &lt; input_height &amp;&amp; c + n &gt; 0 &amp;&amp; c + n &lt; input_width) {
+							if (dev_magnitude[(r + m) * input_width + c + n] &gt; low_threshold) {
+								dev_output[(r + m) * input_width + c + n] = 255;
+							}
+						}
+					}
+				}
+			}
+		}
+    }
+}
+</code><para id="eip-711">The convolution on the device executes only one serial loop
+across the dimensions of the filter exactly as it is defined in
+Equation (3). This sum is then stored in the output array
+according to the block index, block size, and thread index.
+The implementation is modularized so that any separable filter
+can be applied to an input matrix.</para></section><section id="eip-491"><title>High-Level Python Implementation</title><para id="eip-23">
+The Python OpenCV library exposes an API for the entire
+Canny edge detection algorithm. The Canny algorithm is
+similar to, but more nuanced than, our algorithm, substituting
+our selective thresholding procedure for hysteresis. However,
+the end results are very similar. As is evident from Listing 5,
+the procedure is very straightforward.
+</para><code id="eip-678" display="block"><title>Listing 5. Python implementation of Canny edge detection with OpenCV</title>LOW_THRESHOLD = 100
+HIGH_THRESHOLD = 200
+edges = cv2.Canny(img, LOW_THRESHOLD, HIGH_THRESHOLD)</code></section></section>
+<section id="eip-18"><title>MOTION DETECTION ALGORITHM</title><para id="eip-714">Our motion detection algorithm compares the edges from
+two frames temporally separated by a small interval of time and attempts to estimate regions of the frame that exhibit
+movement or motion. This process is then repeated continuously
+to provide a real-time visualization of the regions of
+movement in a continuous video stream. The motion detection
+algorithm we present is composed of the following steps:</para><list id="eip-645" list-type="enumerated" number-style="arabic"><item>Given two frames F1 and F2 separated by a time
+interval of Δt, compute its edges E1 and E2.</item>
+<item>Create a strict binary difference matrix D0 between E1
+and E2 whose value is high at locations at which an
+edge is present in frame but not the other, and low at
+locations at which both frames have an edge or no edge.</item>
+<item>Apply a parameter-controlled movement tolerance
+thresholding operation to the matrix D0 to obtain
+matrix D, in order to suppress potential false positives
+of detected motion from incidental camera movement.</item></list><para id="eip-394">F1 and F2 are obtained by sampling frames from a continuous
+video stream, a task aided by the OpenCV C library.
+Thus, the time interval Δt will be small enough for a realtime
+algorithm. The edges E1 and E2 are computed with the
+edge detection algorithm of Section II. Below, we explore,
+in greater depth, the procedures for building a thresholded
+diffrence matrix and finally estimating the motion area by
+analyzing a spatial difference density map.</para><section id="eip-495"><title>Thresholded Frame-by-Frame Difference Map</title><para id="eip-337">The preliminary requirement in determining areas of motion
+from two frames is a systematic method of determining and
+quantifying the differences between two frames separated by a
+small Δt. Intuitively, areas of motion within the time interval
+Δt should exist at locations at which the difference between
+the two frames is large. This process is then continuously
+repeated for every pair of input frames in order to create a realtime
+motion detector. In our algorithm, we quantify differences
+on a binary basis using edge data from our edge detection
+algorithm, then determine motion locations from a thresholded
+density map of the difference matrix D.
+More formally, we begin with a matrix D0 created from a
+simple comparison of E1 and E2.
+
+Then, for each location (i, j) in D0, a thresholded difference
+matrix D is created by considering a box of constant size b x b
+around that pixel and suppressing the value of the surrounding
+pixels to 0 if its value matches that at D0[i,j]. This step is
+designed to reduce false positives of motion detection arising
+from stray movement of the frame (e.g. camera shake). The
+computation of D is demonstrated in Algorithm 2. The output
+matrix is then used as input to building a spatial difference
+density map, from which we estimate motion locations.</para><para id="eip-911"><media id="other5" alt="">	   
+  <image mime-type="image/jpeg" src="../../media/other5.JPG"/>	 
+</media></para><para id="eip-636"><title>Algorithm 2: Determining the difference matrix between two frames, given their edge data: pseudocode for a serial, CPU implementation</title><media id="alg2" alt="Determining the difference matrix between two frames, given their edge data: pseudocode for a serial, CPU implementation">	   
+  <image mime-type="image/jpeg" src="../../media/alg2.JPG"/>	 
+</media></para><para id="eip-464"><title>Fig. 13. Example of difference matrix computation: original initial frame F1 of dimensions 5312 x 2988</title><media id="fig13" alt="Example of difference matrix computation: original initial frame F1 of dimensions 5312 x 2988">	   
+  <image mime-type="image/jpeg" src="../../media/fig13.jpg"/>	 
+</media></para><para id="eip-69"><title>Fig. 14. Example of difference matrix computation: original initial frame F2</title><media id="fig14" alt="F2">	   
+  <image mime-type="image/jpeg" src="../../media/fig14.jpg"/>	 
+</media></para><para id="eip-138"><title>Fig. 15. Example of difference matrix computation: edges of the initial frame E1</title><media id="fig15" alt="E1">	   
+  <image mime-type="image/jpeg" src="../../media/fig15.jpg"/>	 
+</media></para><para id="eip-821"><title>Fig. 16. Example of difference matrix computation: edges of the initial frame E2</title><media id="fig16" alt="E2">	   
+  <image mime-type="image/jpeg" src="../../media/fig16.jpg"/>	 
+</media></para><para id="eip-568"><title>Fig. 17. Example of difference matrix computation: difference matrix D with parameter b= 12</title><media id="fig17" alt="D'">	   
+  <image mime-type="image/jpeg" src="../../media/fig17.jpg"/>	 
+</media></para></section><section id="eip-240"><title>Motion Area Estimation via a Spatial Difference Density Map</title><para id="eip-244">
+The difference matrix D determined with Algorithm 2 is
+effectively a maximally precise estimate of motion area (e.g.,
+to the resolution of a single pixel, since D is computed on a
+pixel-by-pixel basis). However, in practice, it is more useful
+to consider general regions of the image around which motion
+exists. For this reason, we build a density map of the matrix
+D using equal-sized rectangular sections of the input image
+that approximates the density of the difference per unit area.
+Thus, the original M x N difference matrix D
+is reduced to a matrix D' of size m x n such that
+M = k1m
+N = k2n
+where k1, k2 are integers. Intuitively, choosing a higher k1 and k2
+will result in a higher resolution over which the density is
+evaluated. Selection of k1 and k2 should depend on how large
+of a region over which motion should be estimated. The upper
+limits of k1 and k2 are M and N, respectively, at which point
+D' = D. Each index (m, n) in D' corresponds to the upperleft
+corner of a rectangular section of A whose width is M/m
+and height is N/n .
+Regions of motion are the rectangular sections whose density
+exceeds a user-defined threshold 􀀀, denoting the number
+of difference pixels over the total number of pixels considered
+in the rectangular section. For each such region R in A of
+size M/m x N/n
+</para><para id="eip-312"><media id="other6" alt="">	   
+  <image mime-type="image/jpeg" src="../../media/other6.JPG"/>	 
+</media></para><para id="eip-682"><title>Algorithm 3: Estimating regions of motion in an image with a difference density matrix: pseudocode for a serial, CPU implementation</title><media id="alg3" alt="Estimating regions of motion in an image with a difference density matrix: pseudocode for a serial, CPU implementation">	   
+  <image mime-type="image/jpeg" src="../../media/alg3.JPG"/>	 
+</media></para><para id="eip-975"><title>Fig. 18. Spatial difference density matrix D0 of Figure 17, as determined by Algorithm 3 with parameters m = 10, n = 6, and Gama= 0:01</title><media id="fig18" alt="D'">	   
+  <image mime-type="image/jpeg" src="../../media/fig18.jpg"/>	 
+</media></para><para id="eip-398"><title>Fig. 19. Final estimate of motion area of Figures 13 and 14 based on the density map of Figure 18</title><media id="fig19" alt="Motion Estimation">	   
+  <image mime-type="image/jpeg" src="../../media/fig19.jpg"/>	 
+</media></para></section><section id="eip-355"><title>GPU Parallelization and CUDA Implementation</title><para id="eip-666">
+Our CUDA implementation of our motion detection algorithm
+is similar to that for our implementation of separable
+convolution and edge detection. Using the same 16 threads per
+block, we divide the input image into the appropriate number
+of blocks such that the thresholded difference computation at
+each index (i, j) of Algorithm 2 has its own thread. Thus, each
+element of D is calculated in parallel.
+</para><code id="eip-120" display="block"><title>Listing 6. GPU computation of thresholded difference matrix</title>__global__ void difference_filter(
+	int *dev_out,
+	int *edges_1,
+	int *edges_2,
+	int width,
+	int height,
+	int threshold
+) {
+	const int r = blockIdx.y * blockDim.y + threadIdx.y;
+	const int c = blockIdx.x * blockDim.x + threadIdx.x;
+	const int i = r * width + c;
+
+    // Set it to 0 initially
+    dev_out[i] = 0;
+    int crop_size = 7;
+    if (r &gt; crop_size &amp;&amp; c &gt; crop_size &amp;&amp; r &lt; height - crop_size &amp;&amp; c &lt; width - crop_size &amp;&amp; edges_1[i] != edges_2[i]) {
+        // Set to 255 if there is a pixel mismatch
+        dev_out[i] = 255;
+        for (int x_apron = -threshold; x_apron &lt;= threshold; x_apron++) {
+            for (int y_apron = -threshold; y_apron &lt;= threshold; y_apron++) {
+                // Ensure the requested index is within bounds of image
+                if (c + x_apron &gt; 0 &amp;&amp; r + y_apron &gt; 0 &amp;&amp; c + x_apron &lt; width &amp;&amp; r + y_apron &lt; height) {
+                    // Check if there is a matching pixel in the apron, within the threshold
+                    if (edges_1[(r + y_apron) * width + c + x_apron] == edges_2[i]) {
+                        // Set it back to 0 if a corresponding pixel exists within the vicinity of the match
+                        dev_out[i] = 0;
+                    }
+                }
+            }
+        }
+    }
+}
+</code><para id="eip-654">The construction of the difference density matrix as in Algorithm
+3 is parallelized by considering the value of the
+thresholded difference matrix D' at each index (r; c), mapping
+that index to the appropriate index in the difference density
+matrix (i, j) where (i less than m) and (j less than n), then adding to the value of
+the array at (i, j) at each encounter of a difference pixel in D'.
+Our CUDA implementation therefore relies on the fact that the
+density array is initialized to 0 before the kernel is launched;
+this is accomplished in practice with a calloc operation on
+the host, followed by copying that array to GPU memory.</para><code id="eip-809" display="block"><title>Listing 7. GPU computation of the difference density matrix</title>__global__ void spatial_difference_density_map(
+	double *density_map,
+	int *difference,
+	int width,
+	int height,
+	int horizontal_divisions,
+	int vertical_divisions
+) {
+	int r = blockIdx.y * blockDim.y + threadIdx.y;
+	int c = blockIdx.x * blockDim.x + threadIdx.x;
+	int i = r * width + c;
+	
+	int horizontal_block_size = width/horizontal_divisions;
+	int vertical_block_size = height/vertical_divisions;
+	int block_size = horizontal_block_size * vertical_block_size;
+	
+	const int scaling_factor = 1000;
+	if (difference[i] != 0) {
+		int i = (int)(vertical_divisions * r/(double)height);
+		int j = (int)(horizontal_divisions * c/(double)width);
+		density_map[i * horizontal_divisions + j] += scaling_factor/(double)block_size;
+	}
+}</code><para id="eip-46">The generation of the motion area estimation image is relatively
+straightforward: we map the index (i, j) of D' back to
+an index (r, c) where (r less than M) and (c less than N), and set the value at
+that index high or low accordingly.</para><code id="eip-64" display="block"><title>Listing 8. GPU generation of the motion area estimation image</title>__global__ void motion_area_estimate(
+	int *motion_area,
+	double *density_map,
+	int width,
+	int height,
+	int horizontal_divisions,
+	int vertical_divisions,
+	double threshold
+) {
+	int r = blockIdx.y * blockDim.y + threadIdx.y;
+	int c = blockIdx.x * blockDim.x + threadIdx.x;
+	int i = r * width + c;
+	
+	int density_map_index = (int)(vertical_divisions*r/(double)height) * horizontal_divisions + (int)(horizontal_divisions*c/(double)width);
+
+	if (density_map[density_map_index] &gt;= threshold) {
+		motion_area[i] = 255;
+	} else {
+		motion_area[i] = 0;
+	}
+}</code></section><section id="eip-873"><title>High-Level Python Implementation</title><para id="eip-847">
+The Python implementation of Algorithm 3 is very straightforward
+and looks almost exactly like the pseudo-code, making
+it easy to implement even for those with minimal programming
+experience.
+</para><code id="eip-487" display="block"><title>Listing 9. Python implementation of the motion area estimation image</title>import numpy as np
+
+def detect_motion(e1, e2):
+    height, width, depth = np.shape(e1)
+    d = difference(e1, e2)
+    d_prime = np.zeros((M, N), np.uint8)
+    for i in range(M):
+        for j in range(N):
+            x = 0
+            for i_prime in range(height/M):
+                for j_prime in range(width/N):
+                    if d[i*height/M+i_prime, j*width/N+j_prime] != 0:
+                        x += 1
+            if M*N*x/(height*width*1.0) &gt; T:
+                d_prime[i, j] = 255
+    return d_prime</code></section></section>
+<section id="eip-808"><title>FACIAL RECOGNITION ALGORITHM</title><para id="eip-844">
+Our facial recognition implementation is based off of the
+HAAR features-based cascade classifiers method proposed by
+Viola-Jones in 2001. It’s split into two phases: training and
+detection. The algorithm is as follows:
+</para><list id="eip-229" list-type="enumerated" number-style="arabic"><item>Extract HAAR features of a face from a set of positive
+and negative training images.</item>
+<item>Use adaptive boosting machine learning to train a multistage,
+or cascade, classifier against positive and negative
+HAAR features.</item>
+<item>Apply a final cascade classifier to a loaded image or
+real time video frame.</item></list><para id="eip-411">Due to the resource capacity necessary to train a full facial
+recognition classifier, we used a pre-trained frontal face cascade
+classifier and used OpenCV’s object detection library,
+which encapsulates the algorithm above, and whose theory
+detailed in the following sections.</para><section id="eip-43"><title>HAAR Feature Extraction</title><para id="eip-659">
+In mathematics analysis, Haar wavelets are a sequence
+of rescaled, square-like functions. In image processing, Haar
+features are so named for their resemblance to Haar wavelets.
+Haar features are regularities identified in all human faces, by
+comparing light and dark gradients across the face. These are
+split into edge (two-rectangle) features, line (three-rectangle)
+features, and diagonal (four-rectangle) features.
+</para><para id="eip-460">Each feature is obtained by comparing the pixel intensity in
+the white boxes against the pixel intensity in the dark boxes
+for a wide sample of sub-windows across the entire image. A
+24x24 pixel image window can produce over 160,000 features
+that need to be classified, in some sense, oversampling the
+face.</para><para id="eip-700">The rectangle features can be computed by splitting the
+image into sub-windows called integral images. An integral
+image at a point i'(x, y) is the sum of all pixels to the top and
+to the left of that point.</para><para id="eip-360"><media id="other7" alt="">	   
+  <image mime-type="image/jpeg" src="../../media/other7.JPG"/>	 
+</media></para><para id="eip-258">Since an integral image includes all previously-computed
+integral images contained in its window, in the image of Figure
+21, the region A can be computed as</para><para id="eip-952"><media id="other8" alt="">	   
+  <image mime-type="image/jpeg" src="../../media/other8.JPG"/>	 
+</media>
+
+Any such rectangular sum can be computed using four array
+references.</para><para id="eip-372"><title>Fig. 20. Example application of HAAR features on a face</title><media id="fig20" alt="Example application of HAAR features on a face">	   
+  <image mime-type="image/png" src="../../media/fig20.png"/>	 
+</media></para><para id="eip-177"><title>Fig. 21. Integral image on a face</title><media id="fig21" alt="Integral image on a face">	   
+  <image mime-type="image/png" src="../../media/fig21.png"/>	 
+</media></para></section><section id="eip-728"><title>Cascade Classifier Training</title><para id="eip-21">
+It’s far too resource intensive to evaluate over 160,000
+images for each 24x24 pixel window. However, we can take
+advantage of the fact that only a very small fraction of extracted
+sub-windows in an uncropped image will correspond to
+13
+accurate facial features. To do so, we use a cascaded variation
+of the Adaptive Boosting (or AdaBoost) machine learning
+algorithm. AdaBoost aims to determine the optimal binary
+threshold of HAAR features which best separate negative and
+positive samples.</para><para id="eip-617"><title>Algorithm 4: AdaBoost classifier training</title><media id="alg4" alt="AdaBoost classifier training">	   
+  <image mime-type="image/jpeg" src="../../media/alg4.JPG"/>	 
+</media></para><para id="eip-401">From one pass at the AdaBoost algorithm, it is clear that
+running hundreds of thousands of features on millions of
+samples will be too computationally intensive. However, most
+features in a general, uncropped image do not correspond to
+a face. This allows us to set up a cascaded variant of the
+AdaBoost algorithm.</para><para id="eip-957">In cascading, all the features are grouped into several stages,
+where each stage checks for a certain amount of features. It’s
+set up such that the most common facial features are grouped
+into the earliest cascade stages. This allows us to discard
+most non-facial regions early on and only spend successive
+computations on potentially positive regions. If a region fails
+during a stage, it is discarded, the cascade training stops, and
+then resets at the next potentially positive region. This vastly
+improves resource and time efficiency of classifier training.</para></section><section id="eip-295"><title>Application of Classsifier to Facial Recognition</title><para id="eip-9">
+The final output of the cascade classifier training is a
+classifier XML file that contains the results of the training.
+OpenCV then provides an easy module to apply that XML file to real time face detection. We just need to import the
+file, pre-process our images (or frames from real-time video
+stream), and then run the OpenCV object detection functions.</para><para id="eip-680"><title>Fig. 22. Cascade training framework</title><media id="fig22" alt="Cascade training framework">	   
+  <image mime-type="image/png" src="../../media/fig22.png"/>	 
+</media></para><para id="eip-566">We load the trained classifier, load our image, and then
+the object detect functions returns the position of any found
+faces as a Rectangle with identifiers (x, y, width, height). With
+the returned positions, we can draw a basic rectangle of the
+detected facial regions or even perhaps take it a step further
+and apply Daft Punk masks to any detected faces.</para><para id="eip-569"><title>Fig. 23. Sample input image to the classification</title><media id="fig23" alt="Sample input image to the classification">	   
+  <image mime-type="image/jpeg" src="../../media/fig23.jpg"/>	 
+</media></para><para id="eip-867"><title>Fig. 24. Detected faces from the image of Figure 23 using the trained Frontal Face HAAR classifier</title><media id="fig24" alt="Detected faces from the image of Figure 23 using the trained Frontal Face HAAR classifier">	   
+  <image mime-type="image/png" src="../../media/fig24.png"/>	 
+</media></para><para id="eip-106"><title>Fig. 25. Sample application of facial recognition: scale-invariant Daft Punk masks applied to detected facial regions in real-time</title><media id="fig25" alt="Sample application of facial recognition: scale-invariant Daft Punk masks applied to detected facial regions in real-time">	   
+  <image mime-type="image/png" src="../../media/fig25.png"/>	 
+</media></para></section><section id="eip-199"><title>GPU Parallelization and CUDA Implementation</title><para id="eip-368">
+The CUDA implementation in OpenCV’s object detection
+framework takes advantage of the inherent parallelization
+available in pre-processing the images and traversing all of
+the image sub-windows.</para><para id="eip-840">Unlike previously with the edge detection and motion detection,
+where there is no singularly accepted CUDA implementation
+of the aforementioned algorithms, with facial recognition,
+OpenCV’s library has been heavily optimized over the years
+to provide that functionality</para><para id="eip-483">It would an interesting case study then to abstract the
+functionalities of their object detection libraries, and compare
+the speedups attained from using a heavily optimized 3rd party
+library against the speedups which we obtained from programs
+written by us from scratch.</para><para id="eip-407">OpenCV’s CUDA implementation is similar to its serial
+CPU implementation, except that the cascade classifier is
+loaded in a CUDA optimized format, and the images are loaded
+and processed in CUDA-optimized matrices formats created by
+OpenCV.</para></section><section id="eip-465"><title>High-Level Python Implementation</title><para id="eip-732">
+We again provide sample Python code to demonstrate how
+the facial recognition algorithm would be implemented on
+a high level, with the details of implementation abstracted
+out. The Python OpenCV library exposes an API for facial
+recognition via a cascade classifier, as shown in Listing 10.</para><code id="eip-770" display="block"><title>Listing 10. Python implementation of facial recognition with OpenCV</title>import cv2
+
+IMAGE = 'richb.jpg'
+CASCADE_DATA = 'haarcascade_frontalface_default.xml'
+
+face_cascade = cv2.CascadeClassifier(CASCADE_DATA)
+faces = face_cascade.detectMultiScale(
+	cv2.imread(IMAGE, cv2.IMREAD_GRAYSCALE),
+	scaleFactor=1.1,
+	minNeighbors=5,
+	minSize=(30, 30),
+	flags=cv2.CASCADE_SCALE_IMAGE,
+)
+# faces now contains tuples indicating the location and size of each detected face in the image</code></section></section>
+<section id="eip-13"><title>GPU Speedup Results</title><para id="eip-466">
+Our code for separable convolution, computation of the
+image’s gradient magnitude and angle, non-maximum suppression
+and selective thresholding, and computation of the
+thresholded difference and spatial difference density matrices
+has both serial CPU and parallel CUDA implementations.
+Both the CPU and GPU implementations of the entire facial
+recognition algorithm are encapsulated in an OpenCV library
+internally implemented with CUDA. Here, we present speedup
+results for each of these procedures on various image sizes
+obtained on a system with the following hardware:
+</para><list id="eip-275"><item>Intel Core i5 4200U @ 2.6 GHz (2C, 4T)</item>
+<item>8 GB of DDR3 memory @ 1600 MHz</item>
+<item>NVIDIA GeForce GTX 860M (1152 CUDA cores, 1029
+MHz core clock, 2500 MHz memory clock, 2 GB
+GGDR5 video memory)</item></list><section id="eip-825"><title>Separable Convolution</title><para id="eip-136">The below results were obtained by convolving the same
+image, resized to various image dimensions, with a separated
+Gaussian filter of kernel size k = 3.
+</para><para id="eip-353"><media id="table3" alt="Separable Convolution Speedup Results">
+  <image mime-type="image/jpeg" src="../../media/table3.JPG"/>	 
+</media>
+</para><para id="eip-574"><title>Fig. 26. Visualization of separable convolution speedup versus pixel count</title><media id="fig26" alt="Graph of Separable Convolution Speedup">
+  <image mime-type="image/jpeg" src="../../media/fig26.jpg"/>	 
+</media></para></section><section id="eip-42"><title>Non-maximum Suppression and Selective Thresholding</title><para id="eip-787">
+As discussed previously, our CUDA implementation of nonmaximum
+suppression and selective thresholding is split into
+two parallel tasks that run one after the other: computation
+of the gradient magnitude and angle, followed by the actual
+edge selection algorithm. The computations for the speedup
+numbers below reflect the full procedure of calculating the
+gradient’s magnitude and angle, selecting edges, and finally
+copying the results to host memory.
+</para><para id="eip-242"><media id="table4" alt="SPEEDUP OF NON-MAXIMUM SUPPRESSION AND SELECTIVE THRESHOLDING">	   
+  <image mime-type="image/jpeg" src="../../media/table4.JPG"/>	 
+</media></para><para id="eip-435"><title>Fig. 27. Visualization of non-maximum suppression and selective thresholding speedup versus pixel count</title><media id="fig27" alt="Visualization of non-maximum suppression and selective thresholding speedup versus pixel count">	   
+  <image mime-type="image/jpeg" src="../../media/fig27.jpg"/>	 
+</media></para></section><section id="eip-67"><title>Thresholded Difference Density Matrix and Motion Area Estimation</title><para id="eip-47">
+The below results reflect the speedup in the complete procedure
+of calculating the difference matrix D', determining the
+thresholded difference matrix D, building a difference density
+matrix D', and finally generating an image representing the
+estimated motion area.
+</para><para id="eip-496"><media id="table5" alt="SPEEDUP OF MOTION AREA ESTIMATION">	   
+  <image mime-type="image/jpeg" src="../../media/table5.JPG"/>	 
+</media></para><para id="eip-58"><title>Fig. 28. Visualization of motion area estimation speedup versus pixel count</title><media id="fig28" alt="Visualization of motion area estimation speedup versus pixel count">	   
+  <image mime-type="image/jpeg" src="../../media/fig28.jpg"/>	 
+</media></para></section><section id="eip-414"><title>Facial Recognition</title><para id="eip-107">
+The below results reflect the speedup achieved using
+OpenCV’s object detection framework.
+</para><para id="eip-11"><media id="table6" alt="SPEEDUP OF FACIAL RECONGITION">	   
+  <image mime-type="image/jpeg" src="../../media/table6.JPG"/>	 
+</media></para><para id="eip-3"><title>Fig. 29. Visualization of facial recognition speedup versus pixel count</title><media id="fig29" alt="Visualization of facial recognition speedup versus pixel count">	   
+  <image mime-type="image/jpeg" src="../../media/fig29.jpg"/>	 
+</media></para></section><section id="eip-499"><title>Real-time Motion Detection Performance</title><para id="eip-832">
+Our real-time motion detection implementation continuously
+repeats the following procedure in an infinite loop:
+</para><list id="eip-323" list-type="enumerated" number-style="arabic"><item>Read two frames F1 and F2 from the camera in
+succession</item>
+<item>Apply a Gaussian low-pass filter of kernel size k = 3
+to both frames</item>
+<item>Apply a Sobel edge filter in both directions</item>
+<item>Calculate the edges E1 and E2 from the image with
+non-maximum suppression and selective thresholding</item>
+<item>Calculate the difference matrix D and difference density
+matrix D'</item>
+<item>Draw an image representing the portions of the image
+with motion</item>
+<item>Update a live preview of F1, E1, D', and the motion
+area estimate</item></list><para id="eip-618">Table VII shows basic statistics on the frame rate results
+achieved on a 640 x 480 continuous video stream, running on
+the same hardware as the benchmarks in the previous section.
+The frame rate was evaluated on a 10-second video stream
+in a well-lit environment with motion of a moderate number
+of edge pixels in front of the camera. All procedures (as described in
+this paper) were executed in parallel on the GPU.</para><para id="eip-718"><media id="table7" alt="REAL-TIME FRAME RATE STATISTICS">	   
+  <image mime-type="image/jpeg" src="../../media/table7.JPG"/>	 
+</media></para></section></section>
+<section id="eip-857"><title>CONCLUSION</title><para id="eip-992">
+Our CUDA implementation of both the edge detection
+and motion detection algorithms demonstrate that parallelized,
+GPU computation results in significant speedups compared to a
+serial, CPU implementation. In all benchmarked cases (separable
+convolution with a Gaussian filter, edge detection via nonmaximum
+suppression and selective thresholding, and motion
+area estimation from a difference density map), we find that the
+GPU implementation, running on a mid-range graphics card,
+demonstrated anywhere between a 1.5x to 4.6x speedup over
+a relatively high-performance, overclocked CPU. Furthermore,
+we observe a similar speedup trend when comparing existing
+OpenCV CPU and GPU CUDA implementations of HAARbased
+facial recognition. In all cases, we find that the speedup
+asymptotically approaches a general range as the input size
+increases.
+</para><para id="eip-494">It is important to note the edge case for the separable
+convolution algorithm on images of small input sizes (namely,
+near the dimensions 100 x 100, or 10000 total pixels).For this
+case, we observe a remarkably underwhelming speedup ratio
+of 0.001521, suggesting that a CPU implementation is nearly
+700 times as fast as a GPU implementation (Table III). We
+speculate that, because the input size is very small (especially
+in comparison to the larger versions of the same image, which
+exceed 55 million total pixels in size), the additional overhead
+caused by launching the GPU kernel (e.g. allocating device
+memory, copying the host arrays onto the device, and copying
+the device arrays back to the host following completion of
+the computation) causes the GPU code to take much longer
+to run than the more directly implemented CPU code. This
+reasoning is backed by the fact that, at a 250000 total pixel
+count (a 500 x 500 image), the speedup (2.306766) is still
+much lower than the asymptotic value it approaches as the
+pixel count exceeds about 1 million (2.932381).</para><para id="eip-88">However, an opposite trend appears to be in play for
+the speedup of the non-maximum suppression and selective
+thresholding algorithm (Table IV), where we observe a high
+speedup for low input sizes and a lower speedup for high input
+sizes. We speculate that this is most likely due to the overhead
+of running two separate parallel tasks in sequence, both of
+which require the same amount of memory. As a result of our
+implementation, not only does a large input size result in a
+greater percentage of the time that any thread is idle, but it
+also doubles the total memory footprint of the algorithm. This
+is evident from the significantly higher memory consumption
+of this procedure compared to the others; an input size of 36
+million pixels nearly maxes out the 2 GB of available GPU memory, while the other algorithms consume no more than
+a few hundred megabytes on the largest benchmarking image
+we use. Despite this trend, the speedup is still greater than 1
+for large input sizes, suggesting that a GPU implementation is
+still consistently faster than its CPU counterpart.</para><para id="eip-403">While we were successful in exploiting the parallel architecture
+of GPUs to achieve significant speedups, there are still
+many areas in GPU computation we have yet to explore. Our
+CUDA code for the edge detection and motion detection are
+direct implementations of the algorithms (albeit parallelized
+on each pixel in the image). We did not attempt any degree of
+memory optimization beyond ensuring that no memory leaks
+occur on either the host or device when running the real-time
+program. We also did not attempt to minimize the amount of
+time any given GPU thread is idle; this delay (after a particular
+thread has finished its computation task but has not yet been
+assigned another computation task) is most likely the largest
+bottleneck in our parallel performance. Future improvements
+to our existing work would lie primarily in optimizing these
+parameters, thereby increasing performance.</para><para id="eip-51">A future goal is exploring multi-GPU computation. Our
+implementation, through parallelized, is optimized to run only
+on a single GPU. Multi-GPU computation would add another
+layer of parallelism that could theoretically increase the
+throughput of our computation by the number of GPUs across
+which the work is divided. NVIDIA’s existing multi-GPU
+computational platform is marketed as Scalable Link Interface
+(SLI), allowing for the simultaneous use of 2 to 4 GPUs to
+render real-time graphics. In context of the work we present
+here, a possible future goal is to explore the performance and
+memory efficiency gain from Split Frame Rendering (SFR),
+by allowing each of our parallel algorithms to operate simultaneously
+on a division of the input image; or Alternate Frame
+Rendering (AFR), to allow for the simultaneous computation
+on multiple sets of 2 frames.</para><para id="eip-17"><title>Source Code</title>The full source code for this project, including
+CUDA, Python, and MATLAB implementations of all
+of our algorithms, is open sourced and available at
+github.com/LINKIWI/cuda-computer-vision.</para><list id="eip-217"><title>Authors</title><item>Emilio Del Vechhio, Electrical and Computer Engineering
+‘18</item>
+<item>Kevin Lin, Electrical and Computer Engineering ‘18</item>
+<item>Senthil Natarajan, Electrical and Computer Engineering
+‘17</item></list><list id="eip-313"><title>Acknowledgements</title><item>CJ Barberan, ECE Ph.D. student, Rice University—for
+mentoring the entire team in the conception, development,
+and extensive debugging of our project.</item>
+<item>Richard Baraniuk, Victor E. Cameron Professor of
+ECE, Rice University—for his Fall 2015 instruction of
+the signal processing course that inspired this project.</item></list></section><para id="eip-125"><title>Project Poster</title><media id="poster" alt="Poster">
+	   
+  <download mime-type="application/pdf" src="poster.pdf"/>
+		 
+</media></para><para id="delete_me">
+     <!-- Insert module text here -->
+  </para>
+</content>
+
+</document>

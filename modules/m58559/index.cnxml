@@ -1,0 +1,23 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+  <title>Motivation and Objective</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58559</md:content-id>
+  <md:title>Motivation and Objective</md:title>
+  <md:abstract/>
+  <md:uuid>9a5883a3-7147-4781-8ecd-66abf63d5367</md:uuid>
+</metadata>
+
+<content>
+    <para id="id101545"><emphasis effect="bold">Motivation and Objective</emphasis>
+    </para><para id="id101555">It is often the case that images are taken with imperfections and that
+the main object of focus is captured with some level of blur.
+Furthermore, it is sometimes important and necessary to reclaim
+information from these kinds of images. A classic example is a still
+photograph which captures a car speeding linearly across it (i.e. left
+to right). In criminal investigations, it may be necessary to deblur
+such an image in order to obtain information about the vehicle's
+physical characteristics. Such details may include unusual markings,
+license plate number, etc. which can be of use as evidence in the
+investigation. Thus, our endeavor of deblurring is a useful and
+worthwhile mission to undertake.</para><para id="eip-617">Our objective is to explore the usage of the fluttered shutter in deblurring linear, one-dimensional motion blur and its effectiveness of deblurring in the time domain compared to in the frequency domain. We also aim to compare the effectiveness of this method with that of the traditional boxcar-filter deblurring when different levels of noise are present. </para></content>
+</document>

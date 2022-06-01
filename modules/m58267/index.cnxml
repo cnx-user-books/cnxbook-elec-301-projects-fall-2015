@@ -1,0 +1,17 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Segmentation Method</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58267</md:content-id>
+  <md:title>Segmentation Method</md:title>
+  <md:abstract/>
+  <md:uuid>c3293a3d-9291-4230-880b-0fd688598659</md:uuid>
+</metadata>
+
+<content>
+  <para id="eip-301">The goal of the segmentation algorithm is to accurately separate the cell body from the background and the cell nucleus from the cell body with the appropriate curved boundaries. Cell images are collected from hematology image banks and the images are cropped so that the WBCs are at the center of the cropped images. We used 150 images of 250x250 pixels in total for our project. These are divided evenly between the five cell types. We have chosen not to use any colored images because of the variations in stock image hue and saturation that we cannot control. Each isolated cell body and nucleus will be saved as matrices from both grayscale and binary .bmp images. This results in a total of four processed images per original image. These are needed to extract features relevant to the classification of WBC subtypes. </para><para id="eip-43">We are using multi-threshold masking because in stained cell images, the nucleus of the cell is the most prominent and high contrast feature. The cropped images are further processed in Matlab R2014a with the following steps: green channel isolation, thresholding, cleaning, and masking. The green channel of the RGB image is used to turn the image into gray scale. The gray scaled image is thresholded into different levels. The raw nucleus binary image and the raw WBC binary image are generated. Then, the cleaning process helps removing the noisy background such as RBC fragments. The cleaned binary images are multiplied by the original non-thresholded grayscale image to yield the grayscaled masks of WBC cells and of nuclei.</para><para id="delete_me">
+     <!-- Insert module text here -->
+  </para>
+</content>
+
+</document>

@@ -1,0 +1,17 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Objective and Motivation</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58700</md:content-id>
+  <md:title>Objective and Motivation</md:title>
+  <md:abstract/>
+  <md:uuid>ba49b81b-38d3-4ff8-88cc-d015c8a2a86a</md:uuid>
+</metadata>
+
+<content>
+  <para id="delete_me"><!-- Insert module text here -->
+  Our objective is to accurately classify different accents of English speakers based on short time samples. This idea is a challenge compared to language classification, which would have sounds unique to each language to ease the classification problem. If successful, this would be an important step in speech recognition -- as in, knowing the speaker’s accent would aid in recognizing the words spoken. For example, a speech recognition system could calibrate its algorithm by first using an accent classifier. Being able to understand accented speakers is critical for speech recognition systems, which are being used more and more in technology today.</para><para id="eip-558">Using an online database of accents, we obtained training and testing data sets. From this database, we chose five accents to work with that had a sizable amount of available samples -- Arabic, French, Spanish, Mandarin, and English, specifically American English (4). This selection also covered many of the most common languages in the world. Armed with these audio files categorized by accent, we were able to go about coding an accent classifier. 
+</para><para id="eip-797">Previous studies have typically tested one or two accents, such as only identifying Shanghai-accented Mandarin or distinguishing American English from British English (5,6). Methods often include specifically studying phoneme information, such as the study on Mandarin (5). Another study examined three different accents classified with an artificial neural network. This study had about a 70% accuracy rating, but the algorithm only classified on male voices and threw out samples that it was unsure about (7). We wanted to use a different type of classification in order to bypass studying the difference between specific phonemes in accented speakers, to not have to classify by gender, and to be able to classify between multiple accents. Therefore, we chose to use a scattering coefficient network to extract features, followed by support vector machines to classify those features. The following sections explain both of these concepts and our reasoning for using them, as well as the details of our approach.
+</para></content>
+
+</document>

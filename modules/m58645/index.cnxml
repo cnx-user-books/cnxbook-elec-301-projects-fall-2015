@@ -1,0 +1,26 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Breaking Matrix Completion</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58645</md:content-id>
+  <md:title>Breaking Matrix Completion</md:title>
+  <md:abstract>Summary of how we stretched matrix completion to discover its limits.</md:abstract>
+  <md:uuid>0145458b-db3d-4841-8de4-f8ff3bfc069b</md:uuid>
+</metadata>
+
+<content>
+  <section id="eip-92"><title>The Stress Test</title><para id="eip-475">The main focus of our project was not to simply implement matrix completion -- that has been done many times in the past and is proven to work. What we wanted to do was put the algorithm through a “stress test” to understand its limits. 
+</para><para id="eip-988">To do this, we devised the following plan: </para><list id="eip-81" list-type="enumerated" number-style="arabic"><item>Construct a low rank matrix</item>
+<item>Create a model of uniformity</item>
+<item>Vary the uniformity on unobserved indices in a matrix</item>
+<item>Complete the matrix</item>
+<item>Measure mean squared error between the original matrix and the completed matrix</item>
+<item>Plot mean squared error as a function of uniformity</item></list></section><section id="eip-894"><title>Constructing a Low Rank Matrix</title><para id="eip-976">In order to construct a low rank matrix, remove indices, and compare the results of matrix completion with the actual matrix, we first created two separate matrices of size m x r and r x n with random entries between 0 and 1, where r in the desired rank. We then multiplied those two matrices together, constructing one matrix of size m x n and rank r.</para></section><section id="eip-941"><title>Modeling Uniformity</title><para id="eip-38">Our second challenge was to generate a model of uniformity that provided a simple way to change how uniform the unobserved indices were. We decided to use a jointly Gaussian distribution, modifying the covariance to control uniformity. The idea is simple: low covariance results in a high concentration of indices removed from the center of the matrix, while high covariance results in an almost perfectly uniform distribution. 
+</para><para id="eip-534">In the figure below, the matrix on the left shows a matrix with a very uniform distribution of unobserved entries, characterized by a jointly gaussian distribution with high covariance. The matrix on the right demonstrates a data set with a high degree of nonuniformity. The probability peaks at the center of the matrix, resulting in unobserved indices which are highly concentrated in the middle of the matrix.</para><para id="eip-224"><media id="uniform" alt="A uniform and non uniform represented by a gaussian">
+	   
+  <image mime-type="image/png" src="../../media/dist.png"/>
+		 
+</media></para></section><section id="eip-147"><title>Plotting MSE and Uniformity</title><para id="eip-783">After completing the matrix, we calculated the mean squared error between the original matrix and the prediction provided by matrix completion and stored it in an array, along with the corresponding uniformity percentage. We calculated the uniformity percentage by normalizing each covariance by the largest covariance used, providing a scale between 0 and 100%.
+</para></section></content>
+
+</document>

@@ -1,0 +1,21 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Conclusions and Future Work</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58636</md:content-id>
+  <md:title>Conclusions and Future Work</md:title>
+  <md:abstract/>
+  <md:uuid>e0fd164e-aff5-4d1a-920c-3ce87ef56782</md:uuid>
+</metadata>
+
+<content>
+  <para id="eip-968"><title>Conclusion</title>Here we described a preliminary system for automatic WBC classification. The system consists of image segmentation and machine learning. Both SVM method and neural network are applied. SVM 1 vs all performed the best with 46.7% accuracy; SVM 1 vs 1 with 33.3% accuracy; the neural network with 26.7% accuracy. Though these accuracies are higher than random chance (20%), they are much lower than published values. 
+</para><para id="eip-374">We encountered many limitations throughout this project. We obtained a small data set consisting of only bright field images. In total only 30 images were used per cell type, which had to be further divided into training, validation, and test images. Secondly, our low image resolution and poor consistency of image contrast affected segmentation, feature extraction, and classification. We were also unable to segment overlapping cells due to difficulty applying thresholding. Finally, all monocytes were misclassified in our classification methods. 
+</para><para id="eip-553"><title>Future Work</title>To further improve our system, more pictures of different types of WBC need to be collected. The training data set for each type of WBC should be more than 100, and a consistency of image contrast should be maintained among all images. The resolution of the images should be higher enough for feature recognition and should be consistent among all images. If the large data set is still not sufficient for a high accuracy, segmentation should be improved. The feature matrices could also be improved with color spectrum information from the color images. More features can be added for training to boost the performance of the system, especially for the classification of monocyte, which could not be identified in the current system.
+</para><para id="eip-484">Beside improving the current system, adding more automatic features would be desired. The present system still requires manual cropping and resizing of the images before segmentation. The future segmentation should be able to isolate sub-images of single WBC from a multi-WBC background.
+</para><para id="delete_me">
+     <!-- Insert module text here -->
+  </para>
+</content>
+
+</document>

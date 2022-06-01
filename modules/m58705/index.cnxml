@@ -1,0 +1,24 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+  <title>Conclusion and Future Applications</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58705</md:content-id>
+  <md:title>Conclusion and Future Applications</md:title>
+  <md:abstract/>
+  <md:uuid>db23a704-4e6c-40c4-9788-d4966c7f5342</md:uuid>
+</metadata>
+
+<content>
+    <para id="import-auto-id1165052456525"><title>Conclusion</title>By optimizing our parameters, we could categorize two two-second speech samples into five accents with an accuracy of 50% or greater, compared to an accuracy of 20% for randomly guessing. This is quite an impressive feat considering the variability in people’s voices and that humans themselves have trouble recognizing accents with only a two-second sample. Our algorithm tended to misclassify accents as Spanish -- we hypothesized that this is an artifact of the wide range of origin of the Spanish speakers in our data set. We hope to fix this by using a more complete data set in which we have more training samples for different regional accents. </para><para id="import-auto-id1165052455806"><title>Potential Applications</title>Categorizing accents can be used to improve speech recognition. For example, if the program realizes that it is listening to a certain accent, it could adjust its algorithm to better register the words spoken. Improving the accuracy of speech recognition systems is very important these days, considering their prevalence. Some further applications of using scattering coefficients to categorize speech samples might be recognizing a previous speaker in a recording or classifying the language that someone is speaking.</para><para id="import-auto-id1165052390607"><title>Future Work</title>In the future we can work on improving our algorithm by optimizing the parameters for the scattering coefficients, which were pre-built into the open-source ScatNet code. In addition, training with larger and more varied data sets should lead to an increase in accuracy and an increase in the amount of accents that can be identified.</para>
+<media id="poster" alt="Poster Presentation.">
+	   
+  <image mime-type="image/jpeg" src="../../media/Slide1-825d.jpg"/>
+		 
+</media>
+<para id="eip-218"><title>References</title>(1) Andén, J; Sifre, L; Mallat, S; Kapako, M; and Lostanlen, V. (2012) ScatNet.
+(2) Bruna, J.; Mallat, S. Invariant scattering convolution networks. IEEE Trans. PAMI, to appear.
+(3) "Support Vector Machines (SVM)." MATLAB Documentation. MathWorks, n.d. Web. 16 Dec. 2015.
+(4) Weinberger, Steven. The Speech Accent Archive. George Mason University, n.d. Web. 16 Dec. 2015.
+(5) Zheng, Yanli, et al. "Accent detection and speech recognition for Shanghai-accented Mandarin." Interspeech. 2005.
+(6) Lin, Xiaofan, and Steven Simske. "Phoneme-less hierarchical accent classification." Signals, Systems and Computers, 2004. Conference Record of the Thirty-Eighth Asilomar Conference on. Vol. 2. IEEE, 2004.
+(7) Blackburn, C. S., Julie Vonwiller, and R. W. King. "Automatic accent classification using artificial neural networks." Eurospeech. 1993.</para></content>
+</document>

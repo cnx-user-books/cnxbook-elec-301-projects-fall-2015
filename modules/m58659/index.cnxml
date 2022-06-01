@@ -1,0 +1,116 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML">
+  <title>Image Deblur</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58659</md:content-id>
+  <md:title>Image Deblur</md:title>
+  <md:abstract/>
+  <md:uuid>637675a6-bafb-4b05-8faa-6cd288cd4215</md:uuid>
+</metadata>
+
+<content>
+    <para id="id291053">
+      <emphasis effect="bold">Image Deblur</emphasis>
+    </para>
+    <para id="id291063">
+      <emphasis effect="italics">Image Resizing</emphasis>
+    </para>
+    <para id="id291069">Before implement the deblurring, we resize the blurred image B by mk to
+compensate for the difference between blur size k and code length m. In
+the resized image, the blur size is m instead of k.</para>
+    <para id="id291074">
+      <emphasis effect="italics">Frequency Domain Deblur</emphasis>
+    </para>
+    <list id="id291080" display="block" list-type="bulleted"><item id="uid1"><emphasis effect="bold">Coded:</emphasis> We obtain the frequency response of the filter H(k)
+and the frequency content of the blurred image B(k) through DFT. The
+system can be represented in frequency domain as <m:math overflow="scroll">
+        <m:mrow>
+          <m:msub>
+            <m:mi>B</m:mi>
+            <m:mi>j</m:mi>
+          </m:msub>
+          <m:mrow>
+            <m:mo>(</m:mo>
+            <m:mi>k</m:mi>
+            <m:mo>)</m:mo>
+          </m:mrow>
+          <m:mo>=</m:mo>
+          <m:mi>H</m:mi>
+          <m:mrow>
+            <m:mo>(</m:mo>
+            <m:mi>k</m:mi>
+            <m:mo>)</m:mo>
+          </m:mrow>
+          <m:msub>
+            <m:mi>X</m:mi>
+            <m:mi>j</m:mi>
+          </m:msub>
+          <m:mrow>
+            <m:mo>(</m:mo>
+            <m:mi>k</m:mi>
+            <m:mo>)</m:mo>
+          </m:mrow>
+          <m:mo>+</m:mo>
+          <m:mi>N</m:mi>
+          <m:mrow>
+            <m:mo>(</m:mo>
+            <m:mi>k</m:mi>
+            <m:mo>)</m:mo>
+          </m:mrow>
+        </m:mrow>
+      </m:math>
+    
+where <m:math overflow="scroll"><m:mrow><m:msub><m:mi>B</m:mi><m:mi>j</m:mi></m:msub><m:mrow><m:mo>(</m:mo><m:mi>k</m:mi><m:mo>)</m:mo></m:mrow></m:mrow></m:math> and <m:math overflow="scroll"><m:mrow><m:msub><m:mi>X</m:mi><m:mi>j</m:mi></m:msub><m:mrow><m:mo>(</m:mo><m:mi>k</m:mi><m:mo>)</m:mo></m:mrow></m:mrow></m:math> are the <m:math overflow="scroll"><m:mtext>DFT</m:mtext></m:math> of the j-th
+column of the blurred image and the original image, respectively.
+<m:math overflow="scroll"><m:mrow><m:mi>N</m:mi><m:mo>(</m:mo><m:mi>k</m:mi><m:mo>)</m:mo></m:mrow></m:math> represents the noise. We divide <m:math overflow="scroll"><m:mrow><m:msub><m:mi>B</m:mi><m:mi>j</m:mi></m:msub><m:mrow><m:mo>(</m:mo><m:mi>k</m:mi><m:mo>)</m:mo></m:mrow></m:mrow></m:math> by <m:math overflow="scroll"><m:mrow><m:mi>H</m:mi><m:mo>(</m:mo><m:mi>k</m:mi><m:mo>)</m:mo></m:mrow></m:math> to
+obtain <m:math overflow="scroll"><m:mrow><m:msub><m:mi>X</m:mi><m:mi>j</m:mi></m:msub><m:mrow><m:mo>(</m:mo><m:mi>k</m:mi><m:mo>)</m:mo></m:mrow></m:mrow></m:math>. We then took the inverse <m:math overflow="scroll"><m:mtext>DFT</m:mtext></m:math> of <m:math overflow="scroll"><m:mrow><m:mi>X</m:mi><m:mo>(</m:mo><m:mi>k</m:mi><m:mo>)</m:mo></m:mrow></m:math>
+to obtain the recovered image.
+</item>
+    </list><list id="id291656" display="block" list-type="bulleted">
+      <item id="uid2"><emphasis effect="bold">Boxcar:</emphasis> We use almost the same frequency domain deblur
+approach as used for the coded filter. The primary difference between
+the two approaches is the following: the frequency response of a
+boxcar filter is a sinc function, which contains zeros at certain
+points. We added a small number to the zeros to avoid division-by-zero
+problems. So <m:math overflow="scroll"><m:mrow><m:mi>H</m:mi><m:mo>(</m:mo><m:mi>k</m:mi><m:mo>)</m:mo></m:mrow></m:math> in this case is a slightly modified version of
+the <m:math overflow="scroll"><m:mrow><m:mi>H</m:mi><m:mo>(</m:mo><m:mi>k</m:mi><m:mo>)</m:mo></m:mrow></m:math> used for the coded filter.
+</item>
+    </list>
+    <para id="id291711">
+      <emphasis effect="italics">Time Domain Deblur</emphasis>
+    </para>
+    <list id="id291717" display="block" list-type="bulleted"><item id="uid3"><emphasis effect="bold">Coded:</emphasis> We first generate a circulant matrix whose
+characteristic vector contains the code sequence. Then we kick out the
+wrap-around part of the circulant matrix and take only the left n
+columns, which construct the foreground smear matrix <m:math overflow="scroll"><m:mtext>Af</m:mtext></m:math>
+whose length matches that of the blurred image <m:math overflow="scroll"><m:mi>B</m:mi></m:math>. Then we
+concatenate <m:math overflow="scroll"><m:mtext>Af</m:mtext></m:math> with the background contribution vectors to
+generate the matrix <m:math overflow="scroll"><m:mi>A</m:mi></m:math> for the linear system <m:math overflow="scroll"><m:mrow><m:mi>B</m:mi><m:mo>=</m:mo><m:mi>A</m:mi><m:mi>X</m:mi></m:mrow></m:math>, where
+<m:math overflow="scroll"><m:mi>B</m:mi></m:math> is the blurred image and <m:math overflow="scroll"><m:mi>X</m:mi></m:math> is the original image. Then we
+use least square estimation to find the solution for this system,
+which gives the deblurred image <m:math overflow="scroll"><m:mi>X</m:mi></m:math>, the estimate of <m:math overflow="scroll"><m:mi>X</m:mi></m:math>.
+
+
+Background contribution vectors are <m:math overflow="scroll"><m:mrow><m:mi>b</m:mi><m:mi>k</m:mi><m:mo>=</m:mo><m:mi>a</m:mi><m:mi>b</m:mi><m:mi>s</m:mi><m:mo>(</m:mo><m:mn>1</m:mn><m:mo>-</m:mo><m:mi>A</m:mi><m:mi>f</m:mi><m:mo>*</m:mo><m:mi>o</m:mi><m:mi>n</m:mi><m:mi>e</m:mi><m:mi>s</m:mi><m:mo>(</m:mo><m:mi>n</m:mi><m:mo>,</m:mo><m:mn>1</m:mn><m:mo>)</m:mo><m:mo>)</m:mo></m:mrow></m:math>
+
+, where <m:math overflow="scroll"><m:mi>n</m:mi></m:math> is the length of the original image. The first m elements in
+<m:math overflow="scroll"><m:mtext>bk</m:mtext></m:math> account for the background contribution at the top of the
+blurred image, and the last m elements account for that at the bottom.
+Thus we generate two vectors of length <m:math overflow="scroll"><m:mrow><m:mi>n</m:mi><m:mo>+</m:mo><m:mi>m</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:mrow></m:math>. The first m
+elements of the first vector are the first m elements in <m:math overflow="scroll"><m:mtext>bk</m:mtext></m:math>,
+and the last m elements of the second vector are the last m elements in
+<m:math overflow="scroll"><m:mtext>bk</m:mtext></m:math>. The rest elements of the two vectors are all zeros. These
+two vectors are then concatenated to <m:math overflow="scroll"><m:mtext>Af</m:mtext></m:math> to generate the smear
+matrix <m:math overflow="scroll"><m:mi>A</m:mi></m:math>.
+</item>
+    </list><list id="id292131" display="block" list-type="bulleted"><item id="uid4">
+<emphasis effect="bold">Boxcar:</emphasis> We use basically the same approach as used in time domain deblurring,
+except that we use the 52-length boxcar as the characteristic vector of
+the matrix <m:math overflow="scroll"><m:mtext>Af</m:mtext></m:math>.
+</item>
+    </list><para id="id292162">
+      <emphasis effect="italics">Over-exposure Compensation:</emphasis>
+    </para>
+    <para id="id292168">The deblurred image might have some element values above 1 or below 0.
+We set all the values below 0 to 0 and all above 1 to 1.</para>
+  </content>
+</document>

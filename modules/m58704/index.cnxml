@@ -1,0 +1,38 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Background Information</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58704</md:content-id>
+  <md:title>Background Information</md:title>
+  <md:abstract/>
+  <md:uuid>1d88bdf1-d717-4930-99f3-e84ecbd1b46a</md:uuid>
+</metadata>
+
+<content>
+  <section id="eip-313"><title>Scattering Coefficients</title><para id="eip-12">
+	Scattering networks compute a representation of a signal that preserves high frequency information for classification. Scattering networks have been shown to be successful in classifying images in texture analysis and in handwritten digit analysis, and we believe that this type of transformation would be equally successful in audio classification. We chose to use a scattering coefficient network because a scattering transform is stable to deformations within the classes. By this we mean that even when different characteristics of the accent samples, such as gender or speed of speech, vary, the representation is not affected (2).
+</para>
+<media id="scatnet" alt="A visualization of a scattering network.">
+	   
+  <image mime-type="image/png" src="../../media/scatnet1.png"/>
+		 
+</media>
+<para id="eip-445">The stability of scattering transforms is due to using wavelet transform coefficients and non-linear operators. The wavelet transform is a form of time-frequency representation and is similar to the Fourier transform, except that its bases are wavelets instead of sinusoids. The scattering network, as shown above, “cascades wavelet transform convolutions with non-linear modulus and averaging operators” (2). A scattering propagator applied to the signal computes the first layer signals U[λ1]x at m=1. Applying the propagator again outputs the first order scattering coefficients S[λ1]x and the propagated signal of the second layer at m=2, and so on (2).</para>
+<media id="scatnet_span" alt="Spanish accent scattergram.">
+	   
+  <image mime-type="image/png" src="../../media/spanishscat.png"/>
+		 
+</media>
+<media id="scatnet_arab" alt="Arabic accent scattergram.">
+	   
+  <image mime-type="image/png" src="../../media/arabicscat.png"/>
+		 
+</media>
+<para id="eip-596">The first layer of scattering coefficients can be shown visually as a time-frequency representation called a ‘scattergram’ (1). Similar to a spectrogram, the horizontal axis is time and the vertical axis is frequency. As shown above, the scattergrams of two male voices, speaking the same English words in different accents look distinctly different. It can be seen in this example that the Arabic accent has much more high frequency content than the Spanish accent.</para></section><section id="eip-655"><title>Support Vector Machines</title><para id="eip-630">
+Once we obtained the scattering coefficients, we vectorized the data and used Support Vector Machines (SVM) to classify them. A support vector machine is a fairly common machine learning algorithm that is used to classify an unknown vector into one of two categories. The support vector machine is first trained from data in the vectors from two separate vector sets. The algorithm finds the hyperplane that separates the two datasets with the largest margin in between the two. The support vectors are those vectors that make up the margin of each dataset -- that is, the vectors that are the closest to the hyperplane. The algorithm can then categorize data by looking at which set of support vectors the input is closer to (3). 
+</para><para id="eip-934">In our application, each SVM is trained with datasets from two accents, and then the SVM classifies the testing examples in one of these two categories.​ About 80% (48 samples) of the sample data for each accent were used to train and 20% (12 samples) were used to test the SVMs. ​Because SVM works for binary classification and we have five different accent types, we devised a voting mechanism to accurately classify between the five accents.  An SVM is run for every combination of two accents, for a total of 5 choose 2 = 10 SVMs.​ Each SVM outputs a ‘score,’ showing how likely each sample is to be one of the two accents.  After all the SVMs are run, the sample is classified into the accent with the highest combined score.</para></section><para id="delete_me">
+     <!-- Insert module text here -->
+  </para>
+</content>
+
+</document>

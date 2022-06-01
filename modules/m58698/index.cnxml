@@ -1,0 +1,25 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+  <title>References</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58698</md:content-id>
+  <md:title>References</md:title>
+  <md:abstract/>
+  <md:uuid>8d30f5dc-9153-4d9c-a15d-b633436f7188</md:uuid>
+</metadata>
+
+<content>
+    <para id="id215926">
+      <emphasis effect="bold">References</emphasis>
+    </para>
+    <para id="id215936">Raskar, Ramesh, Amit Agrawal, and Jack Tumblin. "Coded exposure
+photography: motion deblurring using fluttered shutter." ACM
+Transactions on Graphics (TOG) 25.3 (2006): 795-804.</para>
+    <para id="eip-203"><emphasis effect="bold">Team Members</emphasis></para><para id="eip-96">Shuqing Chen
+, Jiaqi Liu
+, Yulan Shih
+, Yiqiu Wang</para><para id="id215940">
+      <emphasis effect="bold">Special Thanks</emphasis>
+    </para>
+    <para id="id215947">Vivek Boominathan, Professor Richard Baraniuk</para>
+  </content>
+</document>

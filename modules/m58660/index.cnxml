@@ -1,0 +1,28 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML">
+  <title>Noise Analysis</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58660</md:content-id>
+  <md:title>Noise Analysis</md:title>
+  <md:abstract/>
+  <md:uuid>26463ab4-794b-4d8d-84eb-1abc6e9059bc</md:uuid>
+</metadata>
+
+<content>
+    <para id="id136122">
+      <emphasis effect="bold">Noise Analysis</emphasis>
+    </para>
+    <para id="id136132">Normally, all element values of an image matrix fall within the interval
+<m:math overflow="scroll"><m:mrow><m:mo>[</m:mo><m:mn>0</m:mn><m:mo>,</m:mo><m:mn>1</m:mn><m:mo>]</m:mo></m:mrow></m:math>. However, the introduced noise reduces the
+deblurring quality, resulting in some elements having values above 1 or
+below 0 in the deblurred image matrix. This effect has been compensated
+in the previous part. We then compute the <m:math overflow="scroll"><m:mtext>PSNR</m:mtext></m:math> of the
+deblurred images with respect to the original/ground-truth and plot the
+PSNR values against different levels of noise, characterized by the
+variances of the independent and identically distributed zero-mean
+Gaussian random variables. The formula of <m:math overflow="scroll"><m:mtext>PSNR</m:mtext></m:math> is
+<m:math overflow="scroll"><m:mrow><m:mi>P</m:mi><m:mi>S</m:mi><m:mi>N</m:mi><m:mi>R</m:mi><m:mo>=</m:mo><m:mn>10</m:mn><m:mo>·</m:mo><m:mtext>lo</m:mtext><m:msub><m:mi>g</m:mi><m:mn>10</m:mn></m:msub><m:mrow><m:mo>(</m:mo><m:mfrac><m:mrow><m:mtext>MA</m:mtext><m:msup><m:mrow><m:msub><m:mi>X</m:mi><m:mi>I</m:mi></m:msub></m:mrow><m:mn>2</m:mn></m:msup></m:mrow><m:mtext>MSE</m:mtext></m:mfrac><m:mo>)</m:mo></m:mrow><m:mo>=</m:mo><m:mn>20</m:mn><m:mo>·</m:mo><m:mtext>lo</m:mtext><m:msub><m:mi>g</m:mi><m:mn>10</m:mn></m:msub><m:mrow><m:mo>(</m:mo><m:mfrac><m:mrow><m:mtext>MA</m:mtext><m:msub><m:mi>X</m:mi><m:mi>I</m:mi></m:msub></m:mrow><m:mrow><m:mtext>MS</m:mtext><m:msup><m:mi>E</m:mi><m:mrow><m:mn>0</m:mn><m:mo>.</m:mo><m:mn>5</m:mn></m:mrow></m:msup></m:mrow></m:mfrac><m:mo>)</m:mo></m:mrow></m:mrow></m:math>
+where <m:math overflow="scroll"><m:mrow><m:mtext>MA</m:mtext><m:msub><m:mi>X</m:mi><m:mi>I</m:mi></m:msub></m:mrow></m:math> is the maximum possible pixel value of the
+image and <m:math overflow="scroll"><m:mtext>MSE</m:mtext></m:math> is the mean squared error between the deblurred
+image and the ground-truth image.</para>
+  </content>
+</document>

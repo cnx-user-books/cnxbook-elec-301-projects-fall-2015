@@ -1,0 +1,38 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>References</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58637</md:content-id>
+  <md:title>References</md:title>
+  <md:abstract/>
+  <md:uuid>ab54e6ce-7625-4f27-9a29-e376094df34d</md:uuid>
+</metadata>
+
+<content>
+  <list id="eip-355" list-type="enumerated" number-style="arabic"><title>Motivation</title><item>"WBC (White Blood Cell) Count." Healthline. N.p., n.d. Web. 16 Dec. 2015.
+</item>
+<item>"White Blood Cell Count." Understanding Lab Tests. N.p., n.d. Web. 16 Dec. 2015.
+</item>
+<item>"Index of /wp-content/uploads/2015/10." Diseases Doctor. N.p., n.d. Web. 16 Dec. 2015. 
+</item></list><list id="eip-642" list-type="enumerated" number-style="arabic"><title>Previous Work</title><item>1.Cseke, Istvan. "A Fast Segmentation Scheme for White Blood Cell Images." IEEE Xplore. IEEE, n.d. Web. 16 Dec. 2015.</item>
+<item>Bikhet, Sawsan, and Ahmed Darwish. "Segmentation and Classification of White Blood Cells." ResearchGate. IEEE, 2000. Web. 16 Dec. 2015.</item>
+<item>Minetto, Rodrigo. "White Blood Cell Segmentation Using Morphological Operators and Scale-space Analysis." ResearchGate. IEEE Xplore, 25 June 2015. Web. 16 Dec. 2015.
+</item></list><list id="eip-648" list-type="enumerated" number-style="arabic"><title>Feature Extraction Implementation</title><item>Ongun, G., Halici, U., Leblebicioglu, K., Atalay, V., Beksac, M., and Beksac, S. (n.d.). Feature extraction and classification of blood cells for an automated differential blood count system. IJCNN'01. International Joint Conference on Neural Networks. Proceedings (Cat. No.01CH37222).  
+</item>
+<item>Lorup, Eric J. "Single Raster Analysis Tools II." IDRISI WWW Tutorial -. N.p., n.d. Web. 16 Dec. 2015.
+</item>
+<item>"Documentation: Graycomatrix." MathWorks. MathWorks, n.d. Web. 16 Dec. 2015.
+</item>
+<item>"Documentation: Entropy." MathWorks. MathWorks, n.d. Web. 16 Dec. 2015.
+</item>
+</list><list id="eip-463" list-type="enumerated" number-style="arabic"><title>Classification Implementation</title><item>Rifkin, Ryan. "Multiclass Classification." www.mit.edu. Massachusetts Institute of Technology, 2008. Web.
+</item>
+<item>Fernandez-Lozano, C., Fernández-Blanco, E., Dave, K., Pedreira, N., Gestal, M., Dorado, J., and Munteanu, C. (n.d.). Improving enzyme regulatory protein classification by means of SVM-RFE feature selection. Mol. BioSyst. Molecular BioSystems, 1063-1063. 
+</item>
+<item>"Documentation: Deploy Neural Network Functions." Mathworks. Mathworks. n.d. Web. 16 Dec. 2015.
+</item>
+<item>"Documentation: Multilayer Neural Network Architecture."  Mathworks. Mathworks. n.d. Web. 16 Dec. 2015.
+</item>
+<item>"An Introduction to Back-Propagation Neural Networks." An Introduction to Back-Propagation Neural Networks. N.p., n.d. Web. 16 Dec. 2015.</item></list></content>
+
+</document>

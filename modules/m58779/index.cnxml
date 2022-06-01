@@ -1,0 +1,16 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Algorithm Code</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58779</md:content-id>
+  <md:title>Algorithm Code</md:title>
+  <md:abstract/>
+  <md:uuid>035abe79-cc56-43f2-ade9-5e32e82d23a9</md:uuid>
+</metadata>
+
+<content>
+  <para id="eip-685">We organized our code into one main function that handles all of the SVM classifications, and a helper function that takes as input a folder of audio files and spits out the vectorized scattering coefficients for each one, stacked on top of each other in one big matrix that we can feed into the SVM. The function also takes in parameters that determine the number of chunks we split each file into and the length of each chunk, as well as some other inputs for selecting the right files from the right folder. The main function first calls this helper function on all of our accents (training and testing data) to generate all of the scattering coefficients.  We then loop through all 10 pairs of accents and create 10 SVMs from their respective training matrices; the testing matrices are stacked together into one big matrix. Each SVM takes two parameters in its construction - a box constraint and a kernel scale, as well as an option for kernel function. These parameters basically tune the SVM to better categorize the specific types of vector it is given. The main function then tests these SVMs with the testing matrix, looping through each SVM and adding up the scores of the winner of each pair, then picking the accent with the highest total. Chunks from the same testing file are added to the same running total, so that one decision is made per audio file. We now have a list of guesses for each audio file, and we know what accent each file actually is. The main function organizes this data into a confusion matrix, and computes the total accuracy and the accuracy of the worst-classified accent.
+</para><para id="eip-402"><title>Optimization</title>To fine tune our system, we ran large chunks of our code with varied parameters to determine what parameters make our system the best at classifying audio files. First, we tuned the input to our scattering networks by varying the number of chunks we split each of our files into and the length of each chunk. We ran our entire program with 1,2,3, and 4 chunks, and between 1 and 7 seconds per chunk (excluding values that exceed the file length). We used a gaussian kernel for our SVM with the default parameters for this step. Our results showed high accuracies when we broke our signal into two chunks, and also when the total length equaled four seconds. Based off of this, we picked two chunks of two seconds each to compute our optimized scattering coefficients. We then ran these optimized coefficients through the rest of our system, this time varying the two parameters for our SVM - kernel scale and box constraint, as well as trying gaussian, polynomial, and linear kernels. We chose a gaussian kernel with parameters that yielded a high total accuracy and a high accuracy of the worst classified accent.  
+</para><para id="eip-112">The code used for optimization be viewed   <link url="https://drive.google.com/file/d/0B-R7ZmvjKnn3SGh0aDJwSTV2ZFk/view?usp=sharing/" window="new">here</link>. </para></content>
+
+</document>

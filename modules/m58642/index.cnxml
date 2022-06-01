@@ -1,0 +1,26 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Results</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58642</md:content-id>
+  <md:title>Results</md:title>
+  <md:abstract>This is where we talk about the results of our project</md:abstract>
+  <md:uuid>e81e2b8f-a6cd-4e73-b444-1266932d531a</md:uuid>
+</metadata>
+
+<content>
+  <section id="eip-332"><title>Expected results</title><para id="eip-801">
+The first observation we made was the obvious -- the mean squared error for matrices that had unobserved indices which were completely non-uniform was very high, and had a large standard deviation, whereas the perfectly uniform matrices had a low mean squared error with a small standard deviation.
+
+</para><para id="eip-147">These results confirmed that our implementation of the algorithm and the code for the other parts of our project worked correctly. 
+</para><para id="eip-302"><media id="graph" alt="Graph of results.">
+	   
+  <image mime-type="image/png" src="../../media/graph.png"/>
+		 
+</media></para></section><section id="eip-112"><title>Unexpected Results</title><para id="eip-770">
+The more surprising result of our tests, showed that matrix completion can tolerate a high level of non-uniformity. Our graph showed that at, according to our model, at about 15% uniformity, matrix completion returns results that are comparable to 100% uniformity. 
+
+</para><para id="eip-468">Even the visual depictions of this kind of uniformity are interesting to ponder. At 15%, there is still a clear accumulation of unobserved indices at the center of the matrix, yet the algorithm works just as well. </para><para id="eip-123">The implications for this are tremendous, and the results show that uniformity isn’t a huge concern when applying matrix completion to real world problems. Unless the matrix is completely non-uniform, matrix completion will provide valid results. 
+</para></section></content>
+
+</document>

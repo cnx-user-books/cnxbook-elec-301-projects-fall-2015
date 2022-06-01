@@ -1,0 +1,36 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Feature Extraction</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58691</md:content-id>
+  <md:title>Feature Extraction</md:title>
+  <md:abstract/>
+  <md:uuid>92473ec3-4e52-4709-b58e-2e2072078de9</md:uuid>
+</metadata>
+
+<content>
+  <para id="eip-550">We have chosen a variety of features from literature review to explore. [1]  These can be divided into two categories, binary and grayscale, which refer to the types of images that the code operates on. The binary features are based on morphological properties including cell and nucleus area and perimeter. The grayscale features describe the texture and contrast of the cells. We implemented a total of 12 features, 5 binary and 7 grayscale. All the features below were calculated for both the cell and the nucleus, except for the ratio of nucleus area to cell area. </para><para id="eip-132">We used 150 test images in order to extract features for our matrices. Again, our images were 250 x 250 pixels which we believed to be large enough to minimize errors from segmentation.</para><section id="eip-527"><title>Binary Features</title><para id="eip-271"><title>Ratio of Nucleus to Cell Area</title>The ratio of nucleus to cell areas can be calculated easily using a set of binary nucleus and cell images.</para><para id="eip-845">We calculate  area by summing all of the white pixels in an image into a scalar number, and compute the ratio by dividing these numbers. </para><para id="eip-674"><title>Ratio of Area to Perimeter</title>The ratio of area to perimeter is calculated for both the cell and the nucleus. Perimeter can be calculated using the MATLAB image processing function regionprops 'Perimeter', which sums continuous adjacent pixels of objects in an image. </para><para id="eip-899"><title>Circularity</title>Circularity is calculated as a function of area and perimeter (ref paper, insert eq + variables). We calculated circularity for both the nucleus and cell. The closer the value is to 1, the more circular an object is. 
+</para><para id="eip-964"><media id="circularity" alt="Circularity formula.">
+	   
+  <image mime-type="image/png" src="../../media/circularity.png"/>
+		 
+</media></para><para id="eip-508"><title>Compactness</title>Compactness is calculated for both the cell and the nucleus. It is another measure of how circular an object is. Compactness is defined as the square root of area of the nucleus divided by the area of a circle with the same perimeter.</para><para id="eip-363"><media id="comp_eq" alt="Compactness Equation">
+	   
+  <image mime-type="image/png" src="../../media/equations for report_compactness.png"/>
+		 
+</media>
+</para></section><section id="eip-269"><title>Grayscale Features</title><para id="eip-480">The grayscale features are based on the gray-level co-occurrence matrix (GLCM), which can be used to extract statistical measures of texture. The GLCM is a matrix with elements p(i,j) that are equal to the number of times in the image a pixel with grayscale intensity i appears adjacent to a pixel with grayscale intensity level j. [3]</para><para id="eip-308"><title>Contrast</title>Contrast measures the difference in grayscale intensity between adjacent pixels over the entire image. The greater the difference in intensity values, the higher the value of contrast.</para><para id="eip-259"><media id="contrast_eq" alt="Contrast equation.">
+	   
+  <image mime-type="image/png" src="../../media/equations for report_contrast.png"/>
+		 
+</media></para><para id="eip-564"><title>Homogeneity</title>Homogeneity measures the distances of GLCM elements from the GLCM diagonal. Homogeneity ranges from 0 to 1. If adjacent pixels always have very similar values of grayscale intensity, the homogeneity will be close to 1.</para><para id="eip-383"><media id="homogeneity_eq" alt="Homogeneity equation.">
+	   
+  <image mime-type="image/png" src="../../media/equations for report_homogeneity.png"/>
+		 
+</media></para><para id="eip-327"><title>Entropy</title>Entropy is a measure of the randomness of grayscale intensity values of pixels. Entropy is based off the grayscale histogram of the image. The histogram can be created from the GLCM by summing across the rows to find the total number of pixels p(i) for each grayscale intensity value i. [4]</para><para id="eip-229"><media id="entropy_eq" alt="Entropy equation.">
+	   
+  <image mime-type="image/png" src="../../media/equations for report_entropy.png"/>
+		 
+</media></para></section></content>
+
+</document>

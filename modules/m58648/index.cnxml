@@ -1,0 +1,29 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Future Work</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58648</md:content-id>
+  <md:title>Future Work</md:title>
+  <md:abstract>This section details our plans for expanding on the project and its results</md:abstract>
+  <md:uuid>cd0a8a8f-753d-4821-ba2d-b95da33a220b</md:uuid>
+</metadata>
+
+<content>
+  <section id="eip-493"><title>Generalizing Non Uniformity</title><para id="eip-841">
+As stated earlier, we wanted our measure of nonuniformity to be simple and easy to control. For the purposes of this project, removing entries based on a jointly Gaussian Distribution met our requirements. However, this measure of nonuniformity is both unrealistic and overly simplistic for real world data sets. With this in mind, future work would involve finding ways to generalize our notion of nonuniformity so that our results are more accurate with regards to real world data sets. 
+
+</para></section><section id="eip-8"><title>Testing with Real World Data</title><para id="eip-88">
+One of the most obvious applications of matrix completion is image reconstruction. The figure below shows how matrix completion can be used to reconstruct a noisy image. The original image had a uniform distribution of removed indices, so matrix completion was able to successfully recreate the image.
+</para><para id="eip-851"><media id="image_comp" alt="Matrix completion used to denoise film">
+	   
+  <image mime-type="image/png" src="../../media/denoise.png"/>
+		 
+</media></para><para id="eip-766">Our results suggest that the algorithm would similarly be able to complete the image if the removed indices had a certain degree of non uniformity. Further testing would involve looking for any kinds of exceptions to our results. Due to the visual nature of these matrices, it would be very easy to see when matrix completion succeeds or fails. We could then look for patterns to generalize the issues the algorithm takes with varying degrees of non uniformity in the missing indices. 
+</para><para id="eip-72">Essentially, this is expanding the whole idea of our stress test to be more cognizant of real world issues of nonuniformity in data sets.
+</para></section><section id="eip-842"><title>Alternative Approaches </title><para id="eip-461">
+This whole project has been guided by the principal that the existing solution for matrix completion is as good as it will get. At our poster presentation, one of the judge’s proposed an interesting idea. Could we (or others with better qualifications) improve the solution? Is there a way to fix the algorithm so that it works for all levels of uniformity? 
+
+</para><para id="eip-816">We don't know the answer to this question and probably don't have the analytical skills to begin looking for one. However, a simple but potentially effective solution quickly comes to mind. We could develop a preprocessing algorithm that makes the data uniform before running matrix completion. Such an algorithm would need to be fast and generalized to all sorts of data sets to truly be a viable solution. 
+</para></section></content>
+
+</document>

@@ -1,0 +1,34 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+  <title>Implications and Future Works</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58697</md:content-id>
+  <md:title>Implications and Future Works</md:title>
+  <md:abstract/>
+  <md:uuid>17a3e2e5-6e46-40a7-aeae-a1b114025c10</md:uuid>
+</metadata>
+
+<content>
+    <para id="id136531">
+      <emphasis effect="bold">Implications</emphasis>
+    </para>
+    <para id="id136541">Our result demonstrates that the fluttered shutter improves deblurred
+image quality significantly. Through a least squares estimation
+approach, we can avoid the problem of having zeros in the filter
+spectrum, an issue that was prevalent with the uncoded/boxcar filter.</para>
+    <para id="id136547">
+      <emphasis effect="bold">Future Works</emphasis>
+    </para>
+    <list id="id136553" display="block" list-type="bulleted">
+      <item id="uid1">
+Exploit deblurring where blur size is larger than object length
+</item>
+      <item id="uid2">
+Noise analysis when the signal power is low (i.e. image is less
+exposed). Focus on low exposure part of the deblurred image.
+</item>
+      <item id="uid3">
+Hardware implementation using physical fluttered shutter and camera
+</item>
+    </list>
+  </content>
+</document>

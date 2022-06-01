@@ -1,0 +1,23 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Segmentation Results</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58630</md:content-id>
+  <md:title>Segmentation Results</md:title>
+  <md:abstract/>
+  <md:uuid>521b3902-1f08-407a-8e6f-218f8c8a8244</md:uuid>
+</metadata>
+
+<content>
+  <para id="delete_me"><figure id="improc"><title>Image Processing</title><media id="results" alt="Image Processing">
+    <image mime-type="image/png" src="../../media/elec results.png"/>
+  </media>
+</figure></para><para id="eip-59">Above is a picture documenting one of the best results. In most cases, processing managed to clear out debris, fill holes, and smooth without large errors. However, there were a few instances where debris was not cleared out properly or portions of the cell body were mistakenly deleted. Additionally, threshold detection could not always successfully separate out nuclei, especially in the cases of more granulated white blood cells such as eosinophils and basophils.</para><para id="eip-828"><figure id="cellnucc"><title>Thresholding Failure</title><media id="threshfail" alt="Cell Nucleus Comparison">
+    <image mime-type="image/x-ms-bmp" src="../../media/cellnuc comparison.bmp"/>
+  </media>
+<caption>Thresholding was unable to separate the cell and the nucleus in this basophil.</caption></figure></para><para id="eip-233"><figure id="debris"><title>Cleaning Failures</title><media id="cleanfail" alt="erode overlap">
+    <image mime-type="image/x-ms-bmp" src="../../media/debris comp.bmp"/>
+  </media>
+<caption>Parts of the cell were erroneously removed while clearing debris in the eosinophil on the left, whereas erosion could not separate the overlapping cells from the eosinophil on the right.</caption></figure></para></content>
+
+</document>

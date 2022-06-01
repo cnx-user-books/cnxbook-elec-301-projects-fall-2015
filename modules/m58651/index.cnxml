@@ -1,0 +1,43 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+  <title>Why Flutter Shutter</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58651</md:content-id>
+  <md:title>Why Flutter Shutter</md:title>
+  <md:abstract/>
+  <md:uuid>af1ac773-a971-40a2-963e-bef8f86ad206</md:uuid>
+</metadata>
+
+<content>
+    <para id="id62155">
+      <emphasis effect="bold">Why Fluttered Shutter?</emphasis>
+    </para>
+    <para id="eip-281"><media id="uncoded_shutter" alt="uncoded shutter visual.">
+	   
+  <image mime-type="image/png" src="../../media/uncoded_shutter_small.png"/>
+		 
+</media></para><para id="id62165">The fourier transform of the boxcar filter, as shown in blue lines in
+the spectrum below, is a sinc function. The sinc function has zeros at
+certain frequencies, and thus the information contained in those
+frequencies are lost entirely when the blurred image is generated. Also,
+the envelope of the sinc function decays rather quickly at high
+frequencies. We know that the noise has constant magnitude at all
+frequencies. So when we try to deblur the image by deconvolution, the
+noise at high frequencies will be greatly amplified.</para>
+    <para id="eip-644"><media id="coded_shutter" alt="coded shutter visual.">
+	   
+  <image mime-type="image/png" src="../../media/coded_shutter_small.png"/>
+		 
+</media></para><para id="id62173">By using a fluttered shutter, which opens and closes during camera
+exposure according to a random binary sequence (a “1” corresponds to
+“open”, “0” to “close”), the fluttered shutter changes the boxcar
+filter to a broad-band filter that preserves high frequency spatial
+details, as shown in the above image in red-colored lines. Also, the
+flutter shutter filter has no zeros in its frequency response. This
+allows direct deconvolution to be possible without immediate destruction
+of image quality.</para><para id="eip-765"><media id="shutter_spectrum" alt="shutter spectrum compare.">
+	   
+  <image mime-type="image/png" src="../../media/Frequency Response Comparison.png"/>
+		 
+</media></para>
+  </content>
+</document>

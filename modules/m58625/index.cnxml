@@ -1,0 +1,53 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Feature Extraction and Classification Methods</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58625</md:content-id>
+  <md:title>Feature Extraction and Classification Methods</md:title>
+  <md:abstract/>
+  <md:uuid>a4966ba5-9f99-4d5e-813a-d1efa902f382</md:uuid>
+</metadata>
+
+<content>
+  <para id="eip-369">The goal of the classification algorithms is to properly differentiate between each cell subtype using features. Following segmentation, features based on texture were extracted from the grayscale images, and features based on size and shape were extracted from the binary images (Table 1). We determined these were the most appropriate for our project from a wide variety discussed in literature. These features were used to train three different classifiers: SVM 1 vs 1, SVM 1 vs all, and a feedforward neural network.</para><table id="eip-858" summary="Feature extraction table"><title>Features Extracted for Classification Algorithms</title>
+<tgroup cols="2"><thead>
+  <row>
+    <entry>Grayscale Features</entry>
+    <entry>Binary Features</entry>
+  </row>
+</thead>
+<tbody>
+  <row>
+    <entry>Homogeneity of cell</entry>
+    <entry>Ratio of area of nucleus to area of cell</entry>
+  </row>
+  <row>
+    <entry>Homogeneity of nucleus</entry>
+    <entry>Area to perimeter ratio of cell</entry>
+  </row>
+  <row>
+    <entry>Contrast of cell</entry>
+    <entry>Area to perimeter ratio of nucleus</entry>
+  </row>
+  <row>
+    <entry>Contrast of nucleus</entry>
+    <entry>Circularity of cell</entry>
+  </row>
+  <row>
+    <entry>Entropy of cell</entry>
+    <entry>Circularity of nucleus</entry>
+  </row>
+  <row>
+    <entry>Entropy of nucleus</entry>
+    <entry>Compactness</entry>
+  </row>
+</tbody>
+
+
+</tgroup>
+</table><para id="delete_me">
+     <!-- Insert module text here -->
+  </para>
+</content>
+
+</document>

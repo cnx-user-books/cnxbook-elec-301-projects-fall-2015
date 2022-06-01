@@ -1,0 +1,28 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+  <title>Abstract</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58567</md:content-id>
+  <md:title>Abstract</md:title>
+  <md:abstract/>
+  <md:uuid>5ba42369-b0dc-4b20-8614-977732f141e2</md:uuid>
+</metadata>
+
+<content>
+    <para id="id62155">
+      <emphasis effect="bold">Abstract</emphasis>
+    </para>
+    <para id="id62165">We would like to simulate and explore the deblurring of images with
+linear, one-dimensional blur. This blur is the result of the object
+being in 1-D motion while the shutter is open. The effect is similar to
+convolving a boxcar filter and smearing the image in it's direction of
+moving. The boxcar filter has a “sinc” spectrum, which causes the
+high-frequency details to be lost. In addition, deconvolving a boxcar
+also magnifies the high frequency noise. These together render the
+result of recovery undesirable.</para>
+    <para id="id62177">By fluttering the shutter during the exposure with a random binary
+sequence, we broaden the smearing filter spectrum, which preserves more
+high frequency details in the blurred image. This produces a decent
+deconvolution result with less noise. We also exploited and compared the
+result of deblurring in both time and frequency domain using both coded
+and uncoded shutter.</para></content>
+</document>

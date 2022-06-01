@@ -1,0 +1,42 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Classification Results</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58632</md:content-id>
+  <md:title>Classification Results</md:title>
+  <md:abstract/>
+  <md:uuid>0d87cbfb-bb33-4f47-8f60-a11957ee1524</md:uuid>
+</metadata>
+
+<content>
+  <para id="eip-803"><title>Overall Results</title>SVM 1 vs all performed the best with 46.7% accuracy, then SVM 1 vs 1 with 33.3% accuracy, and lastly the neural network with 26.7% accuracy. Random chance is 20% accuracy.</para><para id="eip-677">None of the classifiers were able to correctly classify monocytes. The SVM classifiers classified basophils and neutrophils with the highest accuracy, and the neural networks classified eosinophils with the highest accuracy.</para><para id="eip-750"><title>SVM 1 Vs. 1</title><media id="onevsone" alt="onevsone.">
+	   
+  <image mime-type="image/png" src="../../media/confusion_matrix_svm_1v1.png"/>
+		 
+</media></para><para id="eip-166">Figure 1. Confusion matrix for 1 Vs. 1 classification on test data. 
+1 = basophil, 
+2 = eosinophil, 
+3 = lymphocyte, 
+4 = monocyte, 
+5 = neutrophil.</para><para id="eip-555"><title>SVM One Vs. All</title><media id="onevsall" alt="onevsall.">
+	   
+  <image mime-type="image/png" src="../../media/confusion_matrix_svm_1vall.png"/>
+		 
+</media></para><para id="eip-521">Figure 2. Confusion matrix for 1 Vs. All classification on test data. 
+</para><para id="eip-259"><title>Neural Network</title>Neural networks performed the worst of the three methods. No significant correlation was seen on the ROC curve, and the algorithm had 26.7% accuracy in testing. The number of samples that we obtained was not enough to properly train the network. Usually hundreds of training, validation, and testing samples are used. In addition, we believe the uneven distribution of subtypes in the training, validation, and test matrices contributed to the low accuracy compared to SVM. This is a side effect of the low sample numbers.
+</para><para id="eip-13"><media id="nnconf" alt="onevsone.">
+	   
+  <image mime-type="image/jpg" src="../../media/ConfusionMatrices.jpg"/>
+		 
+</media></para><para id="eip-361">Figure 3. Confusion matrices for the training, validation, and test data. Results vary from class to class but are overall low. Like SVM, the neural network was not able to identify monocytes at all.
+</para><para id="eip-228"><media id="ROC" alt="onevsone.">
+	   
+  <image mime-type="image/jpg" src="../../media/ROC curves.jpg"/>
+		 
+</media></para><para id="eip-593">Figure 4. The Receiver Operating Characteristic (ROC) curve is a plot of the true positive rate vs. the false positive rate with varying threshold. A perfect test would show points in the upper-left corner
+</para><para id="delete_me">
+     <!-- Insert module text here -->
+  </para>
+</content>
+
+</document>

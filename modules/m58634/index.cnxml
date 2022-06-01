@@ -1,0 +1,161 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+  <title>Segmentation</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58634</md:content-id>
+  <md:title>Segmentation</md:title>
+  <md:abstract>the real segmentation</md:abstract>
+  <md:uuid>f2669be6-21a1-4a8a-bdbf-2716d0cc824e</md:uuid>
+</metadata>
+
+<content>
+    <para id="import-auto-id1165669731700">clear</para>
+    <para id="import-auto-id1165669652612">% folder containing images</para>
+    <para id="import-auto-id1165669729292">folder = 'pics\Cropped Feature Test Pics\';</para>
+    <para id="import-auto-id1165667317026">celltype = {'neutrophil'</para>
+    <para id="import-auto-id1165669744722"> 'monocyte'</para>
+    <para id="import-auto-id1165669739164"> 'lymphocyte'</para>
+    <para id="import-auto-id1165669710451"> 'eosinophil'</para>
+    <para id="import-auto-id1165669782614"> 'basophil'};</para>
+    <para id="import-auto-id1165671442930">for j = 1:5</para>
+    <para id="import-auto-id1165669766348"> for i = 1:5</para>
+    <para id="import-auto-id1165669776351"> % filename of relevant pictures</para>
+    <para id="import-auto-id1165669794075"> pic = strcat(folder, celltype{j}, '_', num2str(i), '.tif');</para>
+    <para id="import-auto-id1165669762208"> picf = imread(pic);</para>
+    <para id="import-auto-id1165669810096"/>
+    <para id="import-auto-id1165669808744"> [AAfilnuc Afin] = trial3(picf,1);</para>
+    <para id="import-auto-id1165669796416"> figure(10+j)</para>
+    <para id="import-auto-id1165669835473"> subplot(2,3,i)</para>
+    <para id="import-auto-id1165669811339"> %figure(10*j+i)</para>
+    <para id="import-auto-id1165669890719"> %clf</para>
+    <para id="import-auto-id1165669898493"/>
+    <para id="import-auto-id1165669838632"> % saves matrix containing picture values to text file</para>
+    <para id="import-auto-id1165669913243"> %dlmwrite(strcat(folder, celltype{j},num2str(i), '_nucleus', 'bw'),AAfilnuc)</para>
+    <para id="import-auto-id1165669904117"/>
+    <para id="import-auto-id1165669758131"> % saves image; change AAfilnuc (crop) to Afin (composite)</para>
+    <para id="import-auto-id1165670047558"> imwrite(AAfilnuc,strcat(folder, celltype{j},num2str(i), '_nucleus', 'crop.bmp'))</para>
+    <para id="import-auto-id1165670045544"> imshow(Afin)</para>
+    <para id="import-auto-id1165669929671"/>
+    <para id="import-auto-id1165670007257"> [AAfilcell Afin] = trial3(picf,4);</para>
+    <para id="import-auto-id1165669990264"> figure(15+j)</para>
+    <para id="import-auto-id1165670025547"> subplot(2,3,i)</para>
+    <para id="import-auto-id1165670030793"> %figure(10*j+i+5)</para>
+    <para id="import-auto-id1165669918508"> %clf</para>
+    <para id="import-auto-id1165670075934"/>
+    <para id="import-auto-id1165670086450"> % saves matrix containing picture values to text file</para>
+    <para id="import-auto-id1165670110675"> %dlmwrite(strcat(folder, celltype{j},num2str(i), '_cell', 'bw'),AAfilcell)</para>
+    <para id="import-auto-id1165670066046"/>
+    <para id="import-auto-id1165670124565"> % saves image; change AAfilnuc (crop) to Afin (composite)</para>
+    <para id="import-auto-id1165670122785"> imwrite(AAfilcell,strcat(folder, celltype{j},num2str(i), '_cell', 'crop.bmp'))</para>
+    <para id="import-auto-id1165670143739"> imshow(Afin)</para>
+    <para id="import-auto-id1165670144015"/>
+    <para id="import-auto-id1165670043670"> %figure(20+j)</para>
+    <para id="import-auto-id1165670311624"> %subplot(2,3,i)</para>
+    <para id="import-auto-id1165670312276"> %AAfilcomp =times(AAfilcell,AAfilnuc);</para>
+    <para id="import-auto-id1165670312732"> %Afin =times(AAfilcomp,picf(:,:,2));</para>
+    <para id="import-auto-id1165668320190"> %imshow(Afin)</para>
+    <para id="import-auto-id1165668111795"/>
+    <para id="import-auto-id1165668480082"/>
+    <para id="import-auto-id1165668414992"> end</para>
+    <para id="import-auto-id1165670169373">end</para>
+    <para id="import-auto-id1165668465452">figure(1)</para>
+    <para id="import-auto-id1165671809589">close</para>
+    <para id="import-auto-id1165670927312">figure(2)</para>
+    <para id="import-auto-id1165671796663">close</para>
+    <para id="import-auto-id1165670952787">figure(3)</para>
+    <para id="import-auto-id1165670163458">close</para>
+    <para id="import-auto-id1165670025560">figure(4)</para>
+    <para id="import-auto-id1165670005794">close</para>
+    <para id="import-auto-id1165669868342">figure(5)</para>
+    <para id="import-auto-id1165669457618">close</para>
+    <para id="import-auto-id1165669443530">figure(6)</para>
+    <para id="import-auto-id1165669935489">close</para>
+    <para id="import-auto-id1165669841557">function [AAfil Afin] = trial3(pic,cellnuc)</para>
+    <para id="import-auto-id1165669806672"/>
+    <para id="import-auto-id1165669795893">A = pic;</para>
+    <para id="import-auto-id1165670032353">A1=A(:,:,1);%red,not very informative</para>
+    <para id="import-auto-id1165670045776">A2=A(:,:,2);%green, the channel that we're using</para>
+    <para id="import-auto-id1165669892222">A3=A(:,:,3);%blue, not very informative</para>
+    <para id="import-auto-id1165669779330"/>
+    <para id="import-auto-id1165669355679"/>
+    <para id="import-auto-id1165669590115">figure(1)</para>
+    <para id="import-auto-id1165669281000"/>
+    <para id="import-auto-id1165669279670">imshow(A2)</para>
+    <para id="import-auto-id1165669878295"/>
+    <para id="import-auto-id1165671250159">h = uint8(ones(2,2));</para>
+    <para id="import-auto-id1165671271309"/>
+    <para id="import-auto-id1165671394249"/>
+    <para id="import-auto-id1165669363036"/>
+    <para id="import-auto-id1165670636580">%imshow(A1)%red, not using</para>
+    <para id="import-auto-id1165671160834">figure(2)</para>
+    <para id="import-auto-id1165671804521">imshow(A2)%greenchannel</para>
+    <para id="import-auto-id1165673468802">figure(3)</para>
+    <para id="import-auto-id1165671078642">%imshow(A3)%blue,not using</para>
+    <para id="import-auto-id1165671033883">thresh=multithresh(A2,5);%use autothresholding to get the threshold value.</para>
+    <para id="import-auto-id1165670647081">thresh = thresh(cellnuc); %thresh(1) for nucleus; thresh(2) for cell</para>
+    <para id="import-auto-id1165671318968">%separate red blood cell from the white blood cells</para>
+    <para id="import-auto-id1165671319020">AA=A2&lt;thresh;%get the WBC into bright, RBC into black</para>
+    <para id="import-auto-id1165670300868">imshow(AA) %show the binary image</para>
+    <para id="import-auto-id1165671295884"/>
+    <para id="import-auto-id1165674727920">x = 50;</para>
+    <para id="import-auto-id1165671533109">nm = size(A2);</para>
+    <para id="import-auto-id1165672451007">SE=strel('disk',10,0);</para>
+    <para id="import-auto-id1165672424097"> B = regionprops(AA, 'Centroid','PixelIdxList');</para>
+    <para id="import-auto-id1165672417175">for i = 1:length(B);</para>
+    <para id="import-auto-id1165672440528"> if B(i).Centroid(1) &lt; x || B(i).Centroid(2) &lt; x || B(i).Centroid(1) &gt; nm(1) - x || B(i).Centroid(2) &gt; nm(2) - x</para>
+    <para id="import-auto-id1165670956421"> AA(B(i).PixelIdxList)=0;</para>
+    <para id="import-auto-id1165672359454"> imshow(AA)</para>
+    <para id="import-auto-id1165672342350"> end</para>
+    <para id="import-auto-id1165672468015">end</para>
+    <para id="import-auto-id1165670547693"/>
+    <para id="import-auto-id1165670540353">AAfill = imfill(AA, 'holes'); %fill the holes in the image</para>
+    <para id="import-auto-id1165670557316"/>
+    <para id="import-auto-id1165672366409"/>
+    <para id="import-auto-id1165672326352"/>
+    <para id="import-auto-id1165672309250">%function extra_jw</para>
+    <para id="import-auto-id1165672290374">%figure(4), imshow(AAfill);</para>
+    <para id="import-auto-id1165672378801">SE=strel('disk',10,0);%use disk to dilate the image. the radius should be</para>
+    <para id="import-auto-id1165672263918">%modified to a smaller value so that no extra stuff is included out of the</para>
+    <para id="import-auto-id1165672280423"/>
+    <para id="import-auto-id1165674754312">figure(4)</para>
+    <para id="import-auto-id1165671544342">clf</para>
+    <para id="import-auto-id1165668690058"/>
+    <para id="import-auto-id1165671564294">AAfil=bwareaopen(AAfill,2); %delete the pixel clusters that have less than 2</para>
+    <para id="import-auto-id1165671546408">%pixels in the image</para>
+    <para id="import-auto-id1165671526424"/>
+    <para id="import-auto-id1165671520341"/>
+    <para id="import-auto-id1165671497442"/>
+    <para id="import-auto-id1165671462782">%replace B6 with AAfil to use picture instead of differential</para>
+    <para id="import-auto-id1165671938990">Bfil=imclose(AAfil,SE);%use the same disk size to get closed image</para>
+    <para id="import-auto-id1165671941967">if sum(sum(Bfil)) &lt; 2000</para>
+    <para id="import-auto-id1165671921176"> Bfil = imclose(AAfill,SE); </para>
+    <para id="import-auto-id1165671474023">end</para>
+    <para id="import-auto-id1165672544388"/>
+    <para id="import-auto-id1165684298809">% deletes objects with centroid within distance x from border</para>
+    <para id="import-auto-id1165671525287">x = 50;</para>
+    <para id="import-auto-id1165671552953">nm = size(A2);</para>
+    <para id="import-auto-id1165670981153">%for i = 1:10  % erode and dilate to smoothen (for whole cell only)</para>
+    <para id="import-auto-id1165671647566"> Bfil = imerode(Bfil,SE);</para>
+    <para id="import-auto-id1165671650950"> B = regionprops(Bfil, 'Centroid','PixelIdxList');</para>
+    <para id="import-auto-id1165671754006">for i = 1:length(B);</para>
+    <para id="import-auto-id1165671628894"> if B(i).Centroid(1) &lt; x || B(i).Centroid(2) &lt; x || B(i).Centroid(1) &gt; nm(1) - x || B(i).Centroid(2) &gt; nm(2) - x</para>
+    <para id="import-auto-id1165682956045"> Bfil(B(i).PixelIdxList)=0;</para>
+    <para id="import-auto-id1165671589801"> imshow(Bfil)</para>
+    <para id="import-auto-id1165671579575"> end</para>
+    <para id="import-auto-id1165671860808">end</para>
+    <para id="import-auto-id1165678765095"> Bfil = imdilate(Bfil,SE);</para>
+    <para id="import-auto-id1165671844205">%end</para>
+    <para id="import-auto-id1165671600286"/>
+    <para id="import-auto-id1165673417264"/>
+    <para id="import-auto-id1165673415572">figure(5)</para>
+    <para id="import-auto-id1165671571403">imshow(Bfil)</para>
+    <para id="import-auto-id1165673404537"/>
+    <para id="import-auto-id1165671573245"/>
+    <para id="import-auto-id1165671812332"/>
+    <para id="import-auto-id1165673542970">AAfil=uint8(Bfil);</para>
+    <para id="import-auto-id1165673522669">Afin=times(AAfil,A2);%extract from original image</para>
+    <para id="import-auto-id1165673547975">%Afin = AAfil*255;</para>
+    <para id="import-auto-id1165679009269">figure(6)</para>
+    <para id="import-auto-id1165673392879">imshow(Afin)</para>
+    <para id="import-auto-id1165669795810">end</para>
+  </content>
+</document>

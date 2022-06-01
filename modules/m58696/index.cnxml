@@ -1,0 +1,62 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML">
+  <title>Results and Conclusion</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58696</md:content-id>
+  <md:title>Results and Conclusion</md:title>
+  <md:abstract/>
+  <md:uuid>f7197653-c29e-4db5-97c7-517ca4071de7</md:uuid>
+</metadata>
+
+<content>
+    <para id="id305730">
+      <emphasis effect="bold">Results and Conclusion</emphasis>
+    </para>
+    <para id="eip-338"><media id="psnr" alt="psnr plot.">
+	   
+  <image mime-type="image/png" src="../../media/PSNR.png"/>
+		 
+</media>
+        </para><para id="id305740">In the noise analysis, we compute the <m:math overflow="scroll"><m:mtext>PSNR</m:mtext></m:math> as a function of
+noise variance for a variance range from 0 to 0.0005. We do this for the
+deblur results of both the flutter shutter blurred image as well as the
+boxcar filter blurred image. We plot these results, which you can see in
+figure below. Here, the <m:math overflow="scroll"><m:mtext>PSNR</m:mtext></m:math> characterizes the deblur result
+quality and the noise variance characterizes noise level. Two important
+results and conclusions can be drawn here.</para>
+    <para id="eip-692"><emphasis effect="bold">Flutter Shutter: </emphasis>The flutter shutter deblur results always have a higher
+<m:math overflow="scroll"><m:mtext>PSNR</m:mtext></m:math> than the boxcar filter deblur results at all noise
+variances. This shows that images taken with a flutter shutter camera
+can be deblurred more successfully than images taken with a
+traditional boxcar filter in all cases of noise.
+
+     
+    </para><para id="eip-518"><title>Flutter Shutter Deblur - Noise Variance 0</title><media id="coded_deblur_0" alt="coded deblur noise variance 0.">
+	   
+  <image mime-type="image/png" src="../../media/coded_deblur_variance_0_small.png"/>
+		 
+</media></para><para id="eip-722"><title>Flutter Shutter Deblur - Noise Variance 0.0005</title><media id="coded_deblur_0.0005" alt="coded deblur noise variance 0.0005.">
+	   
+  <image mime-type="image/png" src="../../media/coded_deblur_variance_0.0005_small.png"/>
+		 
+</media></para><para id="eip-701"><emphasis effect="bold">Boxcar: </emphasis>The boxcar filter deblur result's <m:math overflow="scroll"><m:mtext>PSNR</m:mtext></m:math> decays extremely
+quickly to a minimum value of 5 even with only a small amount of noise
+in the boxcar filter blurred image. On the other hand, the flutter
+shutter deblur result's <m:math overflow="scroll"><m:mtext>PSNR</m:mtext></m:math> decays rather gradually with
+increasing noise in the flutter shutter blurred image. This result
+shows that flutter shutter images and their deblur results are more
+resistant to noise damage than are boxcar filter images. Deblurred
+pictures demonstrate this conclusion, showing that even at a noise
+variance of only 0.0005, the boxcar filter deblur result is already
+heavily damaged while the flutter shutter deblur result quality is
+maintained comparatively well. .
+
+    </para><para id="eip-703"><title>Boxcar Deblur Noise Variance 0</title><media id="boxcar_deblur_0" alt="boxcar deblur noise variance 0.">
+	   
+  <image mime-type="image/png" src="../../media/uncoded_deblur_variance_0_small.png"/>
+		 
+</media></para><para id="eip-802"><title>Boxcar Deblur Noise Variance 0.0005</title><media id="boxcar_deblur_0.0005" alt="boxcar deblur noise variance 0.0005.">
+	   
+  <image mime-type="image/png" src="../../media/uncoded_deblur_variance_0.0005_small.png"/>
+		 
+</media></para></content>
+</document>

@@ -1,0 +1,57 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Implementation of Matrix Completion</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58649</md:content-id>
+  <md:title>Implementation of Matrix Completion</md:title>
+  <md:abstract>Summarizes the implementation of matrix completion using Chis paper</md:abstract>
+  <md:uuid>489d35ac-d019-4a7b-96f7-91d0fb65ff27</md:uuid>
+</metadata>
+
+<content>
+  <section id="eip-683"><title>Objective of Matrix Completion</title><para id="eip-774"><media id="equation" alt="An equation for matrix completion">
+	   
+  <image mime-type="image/png" src="../../media/1.png"/>
+		 
+</media></para><para id="eip-831">Equation 1 : Objective of the matrix completion
+</para><para id="eip-828">The objective of matrix completion is to minimize Equation 1 stated above. X is the matrix of actual data, and Z is our prediction model.  In real world situations, such as the Netflix Problem, the actual data X is only partially filled. Thus, the term P𝝮c(X) represents the observed indices of the data matrix X, and the following term represents the observed indices of our model matrix Z. The first half of Equation 1, the Frobenius norm of the differences between the observed X and the model Z, would therefore signify how closely the model resembles the actual data. 
+</para><para id="eip-954">The second half of Equation 1, the nuclear norm of the model matrix Z, is called the regularization term, which is used here to represent the rank of the model, which is an appropriate indicator of the simplicity of the model. Simple matrices would have smaller quantities and magnitudes of singular values. </para><para id="eip-250">However, as the equation shows, there exists a “tradeoff between the [simplicity] (rank) of the model and how well the model matches the data.”  If the model is too simple, it is often not accurate. If the model is perfectly accurate, it is often not simple.</para></section><section id="eip-263"><title>Overview of Majorization Minimization Algorithm</title><para id="eip-795">
+The first half of Equation 1 still provides a challenge because it only uses terms that are observed. The question that can be asked at this point would be how can we convert the projection matrix, P𝝮c(X), into a fully completed matrix and still provide the same result for the model Z?
+
+</para><para id="eip-652">Here we introduce the majorization-minimization (MM) algorithm. The following explanation will give an overview of the algorithm applied to f(x). 
+</para><para id="eip-899">The first step of the algorithm is majorizing the function f(x). Majorizing means finding a good surrogate of the actual function f(x) anchored at a point xn. This means that the surrogate function g(x) must have the same value with f(x) at xn. g(x) must always be greater than f(x) at any point of x. In other words, g(x) must dominate f(x).</para><para id="eip-327">After we find the majorization function g(x), the second step of the algorithm is minimization, which means to find the lowest value of g(x). x at the lowest value of g(x) would be our next anchor for the majorization of the next iteration of MM algorithm. 
+</para><para id="eip-354">In the next part, we will look at how we implement the MM algorithm into the matrix completion problem.</para></section><section id="eip-508"><title>Majorization for Matrix Completion Problem </title><para id="eip-963"><media id="equation2" alt="An equation for matrix completion">
+	   
+  <image mime-type="image/png" src="../../media/2.png"/>
+		 
+</media></para><para id="eip-522">Using the quadratic majorization of the matrix, we can therefore simplify the original problem with the surrogate matrix Y written below:</para><para id="eip-753"><media id="equation3" alt="An equation for matrix completion">
+	   
+  <image mime-type="image/png" src="../../media/3.png"/>
+		 
+</media></para></section><section id="eip-251"><title>Minimization for Matrix Completion Problem (Soft Threshold Operator and 4 steps)</title><para id="eip-272"><media id="equation4" alt="An equation for matrix completion">
+	   
+  <image mime-type="image/png" src="../../media/4.png"/>
+		 
+</media></para><para id="eip-487">Given the majorization matrix Y, we now implement the minimization using the 4 steps shown above, which include building a Y matrix, singular value decomposition of Y, soft thresholding of the ranks, and building the next model matrix Z. Soft thresholding, is essentially the solution to the minimization of the majorization of Equation 1. The soft thresholding process is shown below: 
+</para><para id="eip-514"><media id="equation5" alt="An equation for matrix completion">
+	   
+  <image mime-type="image/png" src="../../media/5.png"/>
+		 
+</media></para><para id="eip-4">The detailed proof of achieving minimization through the soft thresholding process can be found on the articles referenced at the end of the report. (“Getting to the Bottom of Matrix Completion”) The relevant code we wrote is shown below:</para><para id="eip-865"><media id="code1" alt="An equation for matrix completion">
+	   
+  <image mime-type="image/png" src="../../media/6.png"/>
+		 
+</media></para></section><section id="eip-226"><title>K-fold Cross Validation</title><para id="eip-622">We used the 10-fold cross validation process to find the optimal regularization term lambda ƛ.  The process includes randomly dividing the observed indices into 10 folds. Then, we remove each fold and use the rest of the indices to find the model Z. For each fold, therefore, we find the mean squared difference of the observed indices between data X and model Z. We then average the results of each 10 fold to get a comprehensive idea of how successful the lambda was. We iterate this process for thousands of lambdas to find the optimal value. The matlab code we wrote is shown below:
+</para><para id="eip-765"><media id="code2" alt="Code for matrix completion">
+	   
+  <image mime-type="image/png" src="../../media/7.png"/>
+		 
+</media>
+
+<media id="code3" alt="Code for matrix completion">
+	   
+  <image mime-type="image/png" src="../../media/8.png"/>
+		 
+</media></para></section></content>
+
+</document>

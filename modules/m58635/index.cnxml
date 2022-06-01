@@ -1,0 +1,655 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Feature Extraction and Classification</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58635</md:content-id>
+  <md:title>Feature Extraction and Classification</md:title>
+  <md:abstract/>
+  <md:uuid>6f4d11a1-acbb-40d6-a30d-16b391bc6566</md:uuid>
+</metadata>
+
+<content>
+  <code id="eip-141" display="block"><title>SVM Method</title>% Performs classification of white blood cell (WBC) types
+% SVM classification (1v1 and 1vAll) using the features homogenity, 
+% contrast, entropy, and compactness
+
+function wbc_SVM
+
+% =========================== Load Data =============================== %
+
+% Load all images: training, cross-validation, and test sets
+[I_c_train, I_n_train, I_bin_c_train, I_bin_n_train, Y_train, m_train] = load_data(1,18);
+[I_c_cv, I_n_cv, I_bin_c_cv, I_bin_n_cv, Y_cv, m_cv] = load_data(19,24);
+[I_c_test, I_n_test, I_bin_c_test, I_bin_n_test, Y_test, m_test] = load_data(25,30);
+
+% ======================== Feature Extraction ===================== %
+
+% Calculate cell to nucleus area ratio, cell perimeter ratio, nucleus
+% perimeter ratio, nucleus circularity and cell circularity
+[fMat_train, A_c_train, A_n_train, ~, P_n_train] = binFeatures(I_bin_c_train, I_bin_n_train);
+[fMat_cv, A_c_cv, A_n_cv, ~, P_n_cv] = binFeatures(I_bin_c_cv, I_bin_n_cv);
+[fMat_test, A_c_test, A_n_test, ~, P_n_test] = binFeatures(I_bin_c_test, I_bin_n_test);
+
+% Calculate homogeneity, contrast, and entropy
+[H_c_train,cst_c_train,E_c_train] = gray(I_c_train,A_c_train);
+[H_n_train,cst_n_train,E_n_train] = gray(I_n_train,A_n_train);
+[H_c_cv,cst_c_cv,E_c_cv] = gray(I_c_cv,A_c_cv);
+[H_n_cv,cst_n_cv,E_n_cv] = gray(I_n_cv,A_n_cv);
+[H_c_test,cst_c_test,E_c_test] = gray(I_c_test,A_c_test);
+[H_n_test,cst_n_test,E_n_test] = gray(I_n_test,A_n_test);
+
+% Calculate compactness of nuclei
+cmp_train = compact(A_n_train,P_n_train);
+cmp_cv = compact(A_n_cv,P_n_cv);
+cmp_test = compact(A_n_test,P_n_test);
+
+% create feature matrix
+X_pre_train = [H_c_train; H_n_train; cst_c_train; cst_n_train; E_c_train; E_n_train; cmp_train; fMat_train]';
+% m_train by N matrix: m_train = total number of training examples, N = number of features
+X_pre_cv = [H_c_cv; H_n_cv; cst_c_cv; cst_n_cv; E_c_cv; E_n_cv; cmp_cv; fMat_cv]';
+% m_cv by N matrix: m_cv = total number of cross-validation examples, N = number of features
+X_pre_test = [H_c_test; H_n_test; cst_c_test; cst_n_test; E_c_test; E_n_test; cmp_test; fMat_test]';
+% m_test by N matrix: m_test = total number of test examples, N = number of features
+
+% normalize feature matricies
+X_train = normalize(X_pre_train);
+X_cv = normalize(X_pre_cv);
+X_test = normalize(X_pre_test);
+
+% =============== Train SVM and Perform Cross-validation =============== %
+
+[model_1v1, model_1vAll] = crossval(X_train,Y_train,X_cv,Y_cv);
+
+
+% ==================== Apply SVM Model to Test Data =================== %
+
+% ------------------- One vs One ---------------- %
+
+[pred3, acc3, ~] = svmpredict(Y_test, X_test, model_1v1);
+
+% ------------------- One vs All ---------------- %
+
+[pred4, acc4, ~] = ovrpredict(Y_test, X_test, model_1vAll);
+
+% report results of classification
+fprintf('Classification Complete!\n\n')
+fprintf('Accuracy on Test Set: 1v1 = %f, 1vAll = %f\n',acc3(1),acc4(1)*100)
+fprintf('\nPredictions:\n\n')
+for i = 1:length(pred3)
+    fprintf('Actual: %f, Predicted by 1v1: %f, Predicted by 1vAll: %f\n',Y_test(i),pred3(i),pred4(i))
+end
+
+% ==================== Print Feature Statistics ========================%
+
+fprintf('Feature Statistics for Training Data:\n\n')
+feature_stats(X_train,m_train);
+fprintf('Feature Statistics for Cross-Validation Data:\n\n')
+feature_stats(X_cv,m_cv);
+fprintf('Feature Statistics for Test Data:\n\n')
+feature_stats(X_test,m_test);
+end
+
+% gray calculates homogeneity, normalized contrast, and normalized 
+% entropy of a grayscale image
+% H = homogenity
+% cst = normalized contrast
+% E = normalized entropy
+function [H,cst,E] = gray(I,A)
+H = zeros(1,length(A));
+cst = zeros(1,length(A));
+E = zeros(1,length(A));
+for i = 1:length(A)
+    % Calculate grayscale co-occurance matrix
+    glcm = graycomatrix(I(1+250*(i-1):250+250*(i-1),:)); 
+    % Calculate homogeneity
+    H_temp = graycoprops(glcm,'Homogeneity');
+    H(i) = H_temp.Homogeneity;
+    % Calculate contrast and normalize by area
+    cst_temp = graycoprops(glcm,'Contrast');
+    cst(i) = cst_temp.Contrast;
+    % Calculate entropy and normalize by area
+    E(i) = entropy(I(1+200*(i-1):200+200*(i-1),:));
+end
+end
+
+% compact calculates compactness
+% A = area of nucleus
+% P = perimeter of nucleus
+% cmp = compactness
+function cmp = compact(A,P)
+for i = 1:length(A)
+    % Calculate area of circle with the same perimeter as the nucleus
+    r = P(i)/(2*pi);
+    circ_A = pi*r^2;
+    % Calculate compactness
+    cmp(i) = sqrt(A(i)/circ_A);
+end
+end
+
+% ovrtrain and ovrperdict from LibSVM multiclass implementation
+% Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+% machines. ACM Transactions on Intelligent Systems and Technology, 
+% 2:27:1--27:27, 2011. Software available at 
+% http://www.csie.ntu.edu.tw/~cjlin/libsvm
+function [model] = ovrtrain(y, x, cmd)
+
+labelSet = unique(y);
+labelSetSize = length(labelSet);
+models = cell(labelSetSize,1);
+
+for i=1:labelSetSize
+    models{i} = svmtrain(double(y == labelSet(i)), x, cmd);
+end
+
+model = struct('models', {models}, 'labelSet', labelSet);
+end
+
+% ovrtrain and ovrperdict from LibSVM multiclass implementation
+% Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+% machines. ACM Transactions on Intelligent Systems and Technology, 
+% 2:27:1--27:27, 2011. Software available at 
+% http://www.csie.ntu.edu.tw/~cjlin/libsvm
+function [pred, ac, decv] = ovrpredict(y, x, model)
+
+labelSet = model.labelSet;
+labelSetSize = length(labelSet);
+models = model.models;
+decv= zeros(size(y, 1), labelSetSize);
+
+for i=1:labelSetSize
+  [l,a,d] = svmpredict(double(y == labelSet(i)), x, models{i});
+  decv(:, i) = d * (2 * models{i}.Label(1) - 1);
+end
+[tmp,pred] = max(decv, [], 2);
+pred = labelSet(pred);
+ac = sum(y==pred) / size(x, 1);
+end
+
+% load cell images
+function [I_c, I_n, I_bin_c, I_bin_n, Y, m] = load_data(start,stop)
+
+% =================== Load cell and nuclei images ===================== %
+
+folder = 'C:\Users\Megan Kehoe\Documents\Junior Year\ELEC 301\grayscale_images\';
+celltype = {'neutrophil'
+    'monocyte'
+    'lymphocyte'
+    'eosinophil'
+    'basophil'};
+I_c = zeros((stop-start+1)*5*250,250);
+I_n = zeros((stop-start+1)*5*250,250);
+iter = 1;
+for j = 1:5
+    for i = start:stop
+        % filename of relevant pictures
+        pic_gray_cell = strcat(folder, 'gray\', celltype{j}, num2str(i), '_cellgray.bmp');
+        im_gray_cell = imread(pic_gray_cell);
+        pic_gray_nuc = strcat(folder, 'gray\', celltype{j}, num2str(i), '_nucleusgray.bmp');
+        im_gray_nuc = imread(pic_gray_nuc);
+        pic_bin_cell = strcat(folder, 'binary\', celltype{j}, num2str(i), '_cellcrop.bmp');
+        im_bin_cell = imread(pic_bin_cell);
+        pic_bin_nuc = strcat(folder, 'binary\', celltype{j}, num2str(i), '_nucleuscrop.bmp');
+        im_bin_nuc = imread(pic_bin_nuc);
+        % matrix for grayscale cell images
+        I_c(iter*250-249:iter*250,:) = im_gray_cell;
+        % matrix for grayscale nuclei images
+        I_n(iter*250-249:iter*250,:) = im_gray_nuc;
+        % matrix for binary cell images
+        I_bin_c(iter*250-249:iter*250,:) = im_bin_cell;
+        % matrix for binary nuclei images
+        I_bin_n(iter*250-249:iter*250,:) = im_bin_nuc;
+        iter = iter+1;
+    end
+end
+% =================== Create label matrix ===================== %
+
+% Y is Nx1 matrix: N = number of training examples
+% 1 = basophil
+% 2 = eosinophil
+% 3 = lymphocyte
+% 4 = monocyte
+% 5 = neutrophil
+m = stop-start+1; % number of training examples per cell type
+Y_bas = ones(m,1);
+Y_eos = 2*ones(m,1);
+Y_lym = 3*ones(m,1);
+Y_mon = 4*ones(m,1);
+Y_neu = 5*ones(m,1);
+Y = [Y_bas; Y_eos; Y_lym; Y_mon; Y_neu];
+end
+
+% print mean and standard deviation of features for each WBC type
+function feature_stats(X,m)
+
+% section feature vector into WBC types
+X_bas = X(1:m,:);
+X_eos = X(1+m:2*m,:);
+X_lym = X(1+2*m:3*m,:);
+X_mon = X(1+3*m:4*m,:);
+X_neu = X(1+4*m:5*m,:);
+
+% calculate mean of normalized features for each WBC type
+mean_bas = mean(X_bas);
+mean_eos = mean(X_eos);
+mean_lym = mean(X_lym);
+mean_mon = mean(X_mon);
+mean_neu = mean(X_neu);
+
+% calculate std dev of normalized features for each WBC type
+std_bas = std(X_bas);
+std_eos = std(X_eos);
+std_lym = std(X_lym);
+std_mon = std(X_mon);
+std_neu = std(X_neu);
+
+fprintf('Mean of Normalized Features\n\n')
+fprintf('WBC type    |    H_c     |    H_n     |    cst_c   |    cst_n   |')
+fprintf('     E_c    |    E_n     |    cmp     |    aRatio  |  pRatio_c  |')
+fprintf('  pRatio_n  |  circ_n    |   circ_c\n')
+fprintf('Basophil    |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f\n',...
+    mean_bas(1),mean_bas(2),mean_bas(3),mean_bas(4),mean_bas(5), mean_bas(6),...
+    mean_bas(7), mean_bas(8), mean_bas(9), mean_bas(10), mean_bas(11), mean_bas(12))
+fprintf('Eosinophil  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f\n',...
+    mean_eos(1),mean_eos(2),mean_eos(3),mean_eos(4),mean_eos(5), mean_eos(6),...
+    mean_eos(7), mean_eos(8), mean_eos(9), mean_eos(10), mean_eos(11), mean_eos(12))
+fprintf('Lymphocyte  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f\n',...
+    mean_lym(1),mean_lym(2),mean_lym(3),mean_lym(4),mean_lym(5), mean_lym(6),...
+    mean_lym(7), mean_lym(8), mean_lym(9), mean_lym(10), mean_lym(11), mean_lym(12))
+fprintf('Monocyte    |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f\n',...
+    mean_mon(1),mean_mon(2),mean_mon(3),mean_mon(4),mean_mon(5), mean_mon(6),...
+    mean_mon(7), mean_mon(8), mean_mon(9), mean_mon(10), mean_mon(11), mean_mon(12))
+fprintf('Neutrophil  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f\n\n',...
+    mean_neu(1),mean_neu(2),mean_neu(3),mean_neu(4),mean_neu(5), mean_neu(6),...
+    mean_neu(7), mean_neu(8), mean_neu(9), mean_neu(10), mean_neu(11), mean_neu(12))
+
+fprintf('Standard Deviation of Normalized Features\n\n')
+fprintf('WBC type    |    H_c     |    H_n     |    cst_c   |    cst_n   |')
+fprintf('     E_c    |    E_n     |    cmp     |    aRatio  |  pRatio_c  |')
+fprintf('  pRatio_n  |  circ_n    |   circ_c\n')
+fprintf('Basophil    |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f\n',...
+    std_bas(1),std_bas(2),std_bas(3),std_bas(4),std_bas(5), std_bas(6),...
+    std_bas(7), std_bas(8), std_bas(9), std_bas(10), std_bas(11), std_bas(12))
+fprintf('Eosinophil  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f\n',...
+    std_eos(1),std_eos(2),std_eos(3),std_eos(4),std_eos(5), std_eos(6),...
+    std_eos(7), std_eos(8), std_eos(9), std_eos(10), std_eos(11), std_eos(12))
+fprintf('Lymphocyte  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f\n',...
+    std_lym(1),std_lym(2),std_lym(3),std_lym(4),std_lym(5), std_lym(6),...
+    std_lym(7), std_lym(8), std_lym(9), std_lym(10), std_lym(11), std_lym(12))
+fprintf('Monocyte    |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f\n',...
+    std_mon(1),std_mon(2),std_mon(3),std_mon(4),std_mon(5), std_mon(6),...
+    std_mon(7), std_mon(8), std_mon(9), std_mon(10), std_mon(11), std_mon(12))
+fprintf('Neutrophil  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f  |  %f\n\n',...
+    std_neu(1),std_neu(2),std_neu(3),std_neu(4),std_neu(5), std_neu(6),...
+    std_neu(7), std_neu(8), std_neu(9), std_neu(10), std_neu(11), std_neu(12))
+end
+
+% train SVM and perform cross-validation to select SM parameters
+function [model_1v1, model_1vAll] = crossval(X_train, Y_train, X_cv, Y_cv)
+iter = 1;
+for C = [0.01 0.1 1 5 10 25 50]
+    for gamma = [0.0002 0.02 0.2 2 5 10]
+        
+        % set parameters
+        % -s 0 : C-SVC (C-paramaterized SVM)
+        % -t 2 : Gaussian kernel
+        % -g : value of gamma parameter
+        % -c : value of C parameter
+        par_train = ['-s 0 -t 2 -b 1 -g ', num2str(gamma), ' -c ', num2str(C)];
+        
+        % ------------------- One vs One ---------------- %
+       
+        % train the model
+        model = svmtrain(Y_train, X_train, par_train);
+        
+        % apply SVM model to cross-validation data
+        % inclusion of Y_cv is for calculation of accuracy
+        [~, acc, ~] = svmpredict(Y_cv, X_cv, model);
+
+        % --------------- One vs All SVM --------------- %
+        
+        % train the model
+        model2 = ovrtrain(Y_train, X_train, par_train);
+        
+        % apply SVM model to cross-validation data
+        % inclusion of Y_cv is for calculation of accuracy
+        [~, acc2, ~] = ovrpredict(Y_cv, X_cv, model2);
+        
+        % ----------- Store info for each combo of C, gamma ------------ %
+        
+        % store accuracy for each combo
+        acc_1v1(iter,:) = [acc(1) C gamma]; 
+        acc_1vAll(iter,:) = [acc2(1) C gamma];
+        
+        % store model for each combo
+        model_1v1(iter) = model;
+        model_1vAll(iter) = model2;
+        
+        iter = iter+1;
+    end
+end
+
+% select parameters for 1v1 all with highest accuracy
+[A_1v1,I_1v1] = max(acc_1v1(:,1));
+C_1v1 = acc_1v1(I_1v1,2);
+gamma_1v1 = acc_1v1(I_1v1,3);
+model_1v1 = model_1v1(I_1v1);
+
+% select parameters for 1vAll all with highest accuracy
+[A_1vAll,I_1vAll] = max(acc_1vAll(:,1));
+C_1vAll = acc_1vAll(I_1vAll,2);
+gamma_1vAll = acc_1vAll(I_1vAll,3);
+model_1vAll = model_1vAll(I_1vAll);
+
+% report results of cross validation
+fprintf('Cross Validation Complete!\n\n')
+fprintf('Accuracy on Cross Validation Set: 1v1 = %f, 1vAll = %f\n',A_1v1,A_1vAll*100)
+fprintf('Optimized Parameters for 1v1:\n')
+fprintf('C = %f | gamma = %f\n------\n',C_1v1,gamma_1v1)
+fprintf('Optimized Parameters for 1vAll:\n')
+fprintf('C = %f | gamma = %f\n------\n\n',C_1vAll,gamma_1vAll)
+end
+
+% normalize feature vectors by subtracting mean and dividing by standard
+% deviation
+function X = normalize(X_pre)
+X_mean = mean(X_pre);
+X_std = std(X_pre);
+
+X = zeros(size(X_pre));
+for i = 1:length(X_mean)
+    X(:,i) = (X_pre(:,i) - X_mean(i)) / X_std(i);
+end
+end
+
+% calculate cell to nucleus area ratio, cell perimeter ratio, nucleus
+% perimeter ratio, nucleus circularity and cell circularity
+function [fMat, aCell, aNuc, pCell, pNuc] = binFeatures(I_c, I_n)
+N = length(I_c)/250;
+fMat = zeros(5,N);       
+for i = 1:N
+    imgCell = I_c(1+250*(i-1):250+250*(i-1),:);
+    imgNuc = I_n(1+250*(i-1):250+250*(i-1),:);
+    
+    aNuc(i) = sum(sum(imgNuc));                    % find area of cell
+    aCell(i) = sum(sum(imgCell));
+    aRatio = aNuc(i)/aCell(i);
+    
+    pCell_temp = regionprops(imgCell, 'perimeter');  % get perimeter
+    pCell(i) = sum(cat(1,pCell_temp.Perimeter));        % sum all the perimeters
+    pCellRatio = aCell(i)/pCell(i);                   % find ratio of area to perimeter
+    
+    pNuc_temp = regionprops(imgNuc, 'perimeter');
+    pNuc(i) = sum(cat(1,pNuc_temp.Perimeter));
+    pNucRatio = aNuc(i)/pNuc(i);                   % find ratio of area to perimeter
+    
+    cCell = 4*pi*aCell(i)/(pCell(i)^2);
+    cNuc = 4*pi*aNuc(i)/(pNuc(i)^2);
+    
+    fMat(1,i) = aRatio;
+    fMat(2,i) = pCellRatio;
+    fMat(3,i) = pNucRatio;
+    fMat(4,i) = cNuc;
+    fMat(5,i) = cCell;
+end
+    
+end
+</code><code id="eip-420" display="block"><title>Neural Network Method</title>% Performs classification of white blood cell (WBC) types
+% Neural Network using binary and grayscale features
+
+function wbc_NN
+
+% =========================== Load Data =============================== %
+
+% Load all images: training, cross-validation, and test sets
+[I_c_train, I_n_train, I_bin_c_train, I_bin_n_train] = load_data(1,18);
+[I_c_cv, I_n_cv, I_bin_c_cv, I_bin_n_cv] = load_data(19,24);
+[I_c_test, I_n_test, I_bin_c_test, I_bin_n_test] = load_data(25,30);
+
+% ======================== Feature Extraction ===================== %
+
+% Calculate cell to nucleus area ratio, cell perimeter ratio, nucleus
+% perimeter ratio, nucleus circularity and cell circularity
+[fMat_train, A_c_train, A_n_train, ~, P_n_train] = binFeatures(I_bin_c_train, I_bin_n_train);
+[fMat_cv, A_c_cv, A_n_cv, ~, P_n_cv] = binFeatures(I_bin_c_cv, I_bin_n_cv);
+[fMat_test, A_c_test, A_n_test, ~, P_n_test] = binFeatures(I_bin_c_test, I_bin_n_test);
+
+% Calculate homogeneity, contrast, and entropy
+[H_c_train,cst_c_train,E_c_train] = gray(I_c_train,A_c_train);
+[H_n_train,cst_n_train,E_n_train] = gray(I_n_train,A_n_train);
+[H_c_cv,cst_c_cv,E_c_cv] = gray(I_c_cv,A_c_cv);
+[H_n_cv,cst_n_cv,E_n_cv] = gray(I_n_cv,A_n_cv);
+[H_c_test,cst_c_test,E_c_test] = gray(I_c_test,A_c_test);
+[H_n_test,cst_n_test,E_n_test] = gray(I_n_test,A_n_test);
+
+% Calculate compactness of nuclei
+cmp_train = compact(A_n_train,P_n_train);
+cmp_cv = compact(A_n_cv,P_n_cv);
+cmp_test = compact(A_n_test,P_n_test);
+
+% create feature matrix
+X_pre_train = [H_c_train; H_n_train; cst_c_train; cst_n_train; E_c_train; E_n_train; cmp_train; fMat_train]';
+% m_train by N matrix: m_train = total number of training examples, N = number of features
+X_pre_cv = [H_c_cv; H_n_cv; cst_c_cv; cst_n_cv; E_c_cv; E_n_cv; cmp_cv; fMat_cv]';
+% m_cv by N matrix: m_cv = total number of cross-validation examples, N = number of features
+X_pre_test = [H_c_test; H_n_test; cst_c_test; cst_n_test; E_c_test; E_n_test; cmp_test; fMat_test]';
+% m_test by N matrix: m_test = total number of test examples, N = number of features
+
+% normalize feature matricies
+X_train = normalize(X_pre_train);
+X_cv = normalize(X_pre_cv);
+X_test = normalize(X_pre_test);
+
+X_fin = [X_train; X_cv; X_test];
+assignin('base','X_fin',X_fin)
+
+% =================== Create label matrix ===================== %
+
+Y_fin = zeros(150,5);
+Y_fin(1:30,1) = 1;
+Y_fin(31:60,2) = 1;
+Y_fin(61:90,3) = 1;
+Y_fin(91:120,4) = 1;
+Y_fin(121:150,5) = 1;
+assignin('base','Y_fin',Y_fin)
+
+% =================== nprtool generated function ===================== %
+
+[Y] = WBCNN(X_fin');
+
+display(Y)
+
+end
+
+function [y1] = WBCNN(x1)
+%MYNEURALNETWORKFUNCTION neural network simulation function.
+%
+% Generated by Neural Network Toolbox function genFunction, 16-Dec-2015 09:49:02.
+% 
+% [y1] = myNeuralNetworkFunction(x1) takes these arguments:
+%   x = 12xQ matrix, input #1
+% and returns:
+%   y = 5xQ matrix, output #1
+% where Q is the number of samples.
+
+
+  % ===== NEURAL NETWORK CONSTANTS =====
+  
+  % Input 1
+  x1_step1_xoffset = [-5.90344272917747;-5.89208546208485;-0.637768770118539;-0.696293796788186;-3.40434320810666;-3.14312328174107;-2.39410595135809;-2.01864130150546;-3.1910660784115;-2.14939014482332;-1.89718479918728;-3.05498352388176];
+  x1_step1_gain = [0.305753758338993;0.303564795136293;0.305753758338992;0.303564795136293;0.456766529694895;0.425301883679229;0.273588869713745;0.476586286231742;0.372673738909549;0.38842100799287;0.281202422061574;0.454059015183198];
+  x1_step1_ymin = -1;
+  
+  % Layer 1
+  b1 = [-1.7827809188065437684;1.4501033367829965215;1.5614509446982758334;-1.1677666592981630345;-1.0971408017647292787;0.82666557394503048517;-0.73702722139244292165;-0.26925862705950714959;0.21396444869375327857;-0.12468221414012239934;-0.022860822221021068895;-0.20125652475303329458;-0.74325367673251629963;0.38713637297072756027;-0.84801449750653035142;-0.97823549375533169759;-1.2790256982622778548;1.5202698097087843365;-1.6216552412380706993;-1.7883784278689605074];
+  IW1_1 = [0.65269077321264334923 -0.62784813315786813792 0.23054673611401493849 -0.33438735781436157435 0.68915792596196057129 0.53946597872735746471 -0.54648719331940187605 0.65272674102503325244 -0.36900742533633940079 -0.33848182698405809843 -0.56173891213039706116 -0.39628871173455432197;-0.62425937074576121066 -0.86594909820268195499 0.96125420124238880604 0.86590158288784957463 -0.29305010408331222393 0.0088109667527298402012 -0.28116999609488529943 0.75223677521530230017 -0.49209950914243028031 0.22767237688696609355 0.28951181656027502598 -0.19858693413931510774;-0.87409457016809355423 -0.24176614380422495332 -0.59413860085417935508 -0.094415210593033371822 -0.23360535537645860105 0.68608568970845018598 -0.88215441881148537462 0.57376293215351292787 0.068425980303622582768 0.028422510155456427033 -0.10071770795761256223 -0.24446620334346177983;0.18317852639240186918 -0.25530896691186200087 0.1841456125704462321 0.6103504051006201081 -0.013016737208259132608 -0.68775458913187581533 -0.14767459853548081661 -0.74805029077191831366 0.37082888823626475316 0.68195761173755509166 -0.65453516994025384701 0.83748308940240767662;0.21219648095654405906 0.90461967533898235416 0.84212095721261492898 -0.54384105597011189737 0.26278653496445081306 0.22920001512820070699 -0.31635285349133523969 -0.2197292030955285691 0.79548984140271628007 0.27811838368491137441 -0.038988735226641604847 -0.61792904286326399976;-0.15995409068203175762 0.35192857507101771297 0.091572642749931237871 -0.58692351450684465686 0.71038167671771246248 -0.80275756583490087692 0.26769243284641780489 -0.10045427244525970134 -0.30783390052233811085 0.093758356605187886945 0.74312923232637795312 -0.83367174118791709247;0.17757047927313387992 0.29535786067408831279 -0.40086163424319443127 -0.79378179629056244693 0.7673384089879279335 -0.64048836337807124597 -0.55675213496442632621 -0.32416623027720903316 -0.67939842147653006776 0.26275724315411352894 0.21232423500480238077 0.31101061322804712805;0.6332800200766275367 0.93283001155606748434 -0.019359681845131680028 -0.057655482752824900594 0.010114559415013726906 -0.13946923636052924178 0.22558679233771050665 1.0942840616738851445 -0.11136271505772811496 -0.73253325042058281547 0.32294905645266119842 -0.52449976561828137722;-0.14073087220256236263 0.021212015547970253238 0.057140735770108572189 -0.058672300187391002169 0.52983578526836394573 -0.74887138757099414033 -0.57288741357302119805 -0.6283420285347269818 -0.52617375349461059653 -0.86951465293454088812 0.80919201098596682531 -0.32745155545458048962;0.17711366901026434628 -0.3415249419935150188 -0.80508835806010381475 -0.23379863144509765993 -0.42010221638258010701 -0.20053181629465288704 -0.95539500926782872092 -0.81885426378697545591 0.44341612216086750964 0.65430640353779834228 0.1842843931796633028 0.35512039383732951769;-0.3051127379722994859 0.62132057240537752474 0.26115351724392993349 0.65014762006875670419 -0.81614974961696440392 -0.14573608764669954141 0.82713955354982193757 0.78882592794118477908 -0.28590689427630500141 -0.26129213000622647511 -0.02020561330510827272 0.3373254660593946741;-0.77637198034006160707 -0.53951123217202268112 -0.46415082703041404821 0.031394647379238131701 -0.36615481448419945343 0.39064463087294948318 0.051552799417610144228 -0.52617430654106644994 0.53349297850098487128 -0.66128543196876077293 -0.015933919392453241293 0.49312948757777663733;-0.40109170760184048588 -0.80073843659735322031 -0.43930883908024825901 0.52174450165408969848 -0.51563427416045870544 0.05899251331655103181 -0.10723127387783933095 0.79323791479436156493 -0.19932362274186257722 0.84877089669146399409 0.34396274237390433992 0.067153874094595056299;-0.14966260299231101683 0.043414764816473203068 0.28029588061563043278 0.97473404212223824228 -0.017542187476933816109 -0.50697210513255575037 -0.57889211246397831445 0.25065675293005146296 0.50367137065966816056 -0.90358818880026914311 0.60437309508048953077 0.46220676188375653393;-0.62287679623497327341 -0.40452643027298235134 0.52128655366403209293 0.5343793144254529448 -0.033631083527157080992 -0.77501205700901520945 0.08631051496969871506 0.78963365219209102897 -0.45973983902683918101 -0.73557456159983314326 0.16790128002690762887 0.30544370296543016385;-0.64570433840792385016 -0.52544096066776668774 0.32899182851515956783 -0.74564190480302972031 0.37823110105658813707 -0.79582818968853852315 -0.62184971625171903131 0.55183313390807819943 0.48061153088261304722 0.1937955780359462421 0.33401686141670228203 0.45761760559864517184;-0.48398577866872094511 -0.51247727709974244537 0.014671039167520393692 1.0557973713321149312 -0.29689953549894754214 -0.65761764293316926633 -0.5810878874447493736 0.19700317375217216154 0.79378864664069426205 -0.14929342020070573982 -0.12689300872608549886 0.042426282965546707748;0.31817673028468090868 -0.25581136662340991927 0.53720337579369925596 0.53555993713253458033 0.54196787329454343407 -0.12164193332507920731 -0.58176293647635313189 0.68171724770757780032 -0.062736861681844752203 -0.7486116451177108333 0.18243184031698231329 -0.62307684852446698631;-0.069635276939243387351 -0.89084002756759428365 0.81166395697372595297 0.24423485016676374504 -0.42320893506046336485 0.18515385919973045836 -0.3076186239021012625 0.12357314038408856449 0.16305041020192123646 -0.80472851533031042326 -0.58188953694713496656 -0.56469246302677866822;-0.015588988418843111039 -0.52789681905975716081 -0.056374237729799464569 -0.89601894033758433533 0.39301007620720507241 -0.83670340441315416147 -0.30214624216503421783 -0.0057481349615575204684 -0.71307657083127085063 -0.48395831532568406308 0.69274963889038942977 -0.055266019413176742381];
+  
+  % Layer 2
+  b2 = [0.53769303882958074947;-0.13217105139299178962;-0.041876094256106277669;-0.7675131872347213946;1.0087377770168073354];
+  LW2_1 = [0.21962664914031176933 -0.72527984788570698527 0.48119075681324496863 -0.57920005507386096433 -0.49526572769559640275 -0.76883264351233959744 0.6077570552882199939 -0.65833342927171101255 0.46357354835090158751 0.16489556453274598069 -0.59151628713453463515 -0.26781130066266212175 0.87623321078000115936 0.72393553132938714967 -0.61151148862114468319 0.48388385514578952096 0.39865912449009027752 0.55897661778673335409 0.30969009674021441558 0.78045129153028458546;0.0035564839628999911185 -0.057628961929088326488 -0.088823889958358576147 -0.00064596083541778454018 0.055564189321075478645 0.15434573806520032746 0.78683235394159178888 -0.035924556214055346215 -0.67911040762302188334 -1.04974983100161956 0.33926375814301046319 -0.55803871691417183953 0.12403303585593739022 0.43037424532005968958 -0.69997975566461012598 -0.031919952989213386252 0.54694494666826709572 -0.081580997762416965213 -0.14448077219790639303 -0.92615947408013654663;0.24280165162834940751 -0.027248414507144408381 0.78376469520957747772 -0.45780077805308355687 -0.92600637679302721939 0.72254196979932472367 0.13582085498423490666 0.14902459081642380201 -0.85682223245604505202 0.10128386847234764623 0.61228308567052469602 0.17446679499524980761 0.27767541973378268017 -0.59222942240648046575 -0.35805815307864358177 0.93727112683396773818 -0.33110525022824094377 0.63339806688071265128 0.43718826827843576543 0.60407925200793333165;-0.11671612335179254449 0.76984021517165235338 0.76794893651558093772 0.73338157588525842989 -0.51980599903868773826 0.0042697073699095493618 0.07008170499484027427 0.43580004941712890965 -0.11825315186169747805 0.44134930378298420361 -0.33202715740492544372 -0.4975328211750704166 0.82433476791666115968 -0.30437588329739195814 -0.23548223964335837644 -0.5599252080618919436 -0.083567274004609434779 0.22438465533450058231 -0.91935923520596096736 0.61291406222756139588;0.53530034845386287312 0.98772941003983194541 -0.20305214990264566777 -0.65939248652009341267 0.28308058528562435319 -0.2875816696891681512 -0.028388049541314110125 0.49988032423210143618 -0.091158701345464332455 -0.11047284972129928216 -0.01324464759306478133 -0.84726415640066821133 -0.73598291099507062718 0.33689391765723658567 -0.78614323618766546176 0.86741256483480888573 -0.79467674930756371232 -0.31322875302042174628 0.96921512208426130464 0.39684880198380179106];
+  
+  % ===== SIMULATION ========
+  
+  % Dimensions
+  Q = size(x1,2); % samples
+  
+  % Input 1
+  xp1 = mapminmax_apply(x1,x1_step1_gain,x1_step1_xoffset,x1_step1_ymin);
+  
+  % Layer 1
+  a1 = tansig_apply(repmat(b1,1,Q) + IW1_1*xp1);
+  
+  % Layer 2
+  a2 = softmax_apply(repmat(b2,1,Q) + LW2_1*a1);
+  
+  % Output 1
+  y1 = a2;
+end
+
+% ===== MODULE FUNCTIONS ========
+
+% Map Minimum and Maximum Input Processing Function
+function y = mapminmax_apply(x,settings_gain,settings_xoffset,settings_ymin)
+  y = bsxfun(@minus,x,settings_xoffset);
+  y = bsxfun(@times,y,settings_gain);
+  y = bsxfun(@plus,y,settings_ymin);
+end
+
+% Competitive Soft Transfer Function
+function a = softmax_apply(n)
+  nmax = max(n,[],1);
+  n = bsxfun(@minus,n,nmax);
+  numer = exp(n);
+  denom = sum(numer,1); 
+  denom(denom == 0) = 1;
+  a = bsxfun(@rdivide,numer,denom);
+end
+
+% Sigmoid Symmetric Transfer Function
+function a = tansig_apply(n)
+  a = 2 ./ (1 + exp(-2*n)) - 1;
+end
+
+% gray calculates homogeneity, normalized contrast, and normalized 
+% entropy of a grayscale image
+% H = homogenity
+% cst = normalized contrast
+% E = normalized entropy
+function [H,cst,E] = gray(I,A)
+H = zeros(1,length(A));
+cst = zeros(1,length(A));
+E = zeros(1,length(A));
+for i = 1:length(A)
+    % Calculate grayscale co-occurance matrix
+    glcm = graycomatrix(I(1+250*(i-1):250+250*(i-1),:)); 
+    % Calculate homogeneity
+    H_temp = graycoprops(glcm,'Homogeneity');
+    H(i) = H_temp.Homogeneity;
+    % Calculate contrast and normalize by area
+    cst_temp = graycoprops(glcm,'Contrast');
+    cst(i) = cst_temp.Contrast;
+    % Calculate entropy and normalize by area
+    E(i) = entropy(I(1+200*(i-1):200+200*(i-1),:));
+end
+end
+
+% compact calculates compactness
+% A = area of nucleus
+% P = perimeter of nucleus
+% cmp = compactness
+function cmp = compact(A,P)
+for i = 1:length(A)
+    % Calculate area of circle with the same perimeter as the nucleus
+    r = P(i)/(2*pi);
+    circ_A = pi*r^2;
+    % Calculate compactness
+    cmp(i) = sqrt(A(i)/circ_A);
+end
+end
+
+% load cell images
+function [I_c, I_n, I_bin_c, I_bin_n] = load_data(start,stop)
+
+% =================== Load cell and nuclei images ===================== %
+
+folder = '/Users/Yusi/Downloads/';
+celltype = {'neutrophil'
+    'monocyte'
+    'lymphocyte'
+    'eosinophil'
+    'basophil'};
+I_c = zeros((stop-start+1)*5*250,250);
+I_n = zeros((stop-start+1)*5*250,250);
+iter = 1;
+for j = 1:5
+    for i = start:stop
+        % filename of relevant pictures
+        pic_gray_cell = strcat(folder, 'gray/', celltype{j}, num2str(i), '_cellgray.bmp');
+        im_gray_cell = imread(pic_gray_cell);
+        pic_gray_nuc = strcat(folder, 'gray/', celltype{j}, num2str(i), '_nucleusgray.bmp');
+        im_gray_nuc = imread(pic_gray_nuc);
+        pic_bin_cell = strcat(folder, 'binary/', celltype{j}, num2str(i), '_cellcrop.bmp');
+        im_bin_cell = imread(pic_bin_cell);
+        pic_bin_nuc = strcat(folder, 'binary/', celltype{j}, num2str(i), '_nucleuscrop.bmp');
+        im_bin_nuc = imread(pic_bin_nuc);
+        % matrix for grayscale cell images
+        I_c(iter*250-249:iter*250,:) = im_gray_cell;
+        % matrix for grayscale nuclei images
+        I_n(iter*250-249:iter*250,:) = im_gray_nuc;
+        % matrix for binary cell images
+        I_bin_c(iter*250-249:iter*250,:) = im_bin_cell;
+        % matrix for binary nuclei images
+        I_bin_n(iter*250-249:iter*250,:) = im_bin_nuc;
+        iter = iter+1;
+    end
+end
+end
+
+% normalize feature vectors by subtracting mean and dividing by standard
+% deviation
+function X = normalize(X_pre)
+X_mean = mean(X_pre);
+X_std = std(X_pre);
+
+X = zeros(size(X_pre));
+for i = 1:length(X_mean)
+    X(:,i) = (X_pre(:,i) - X_mean(i)) / X_std(i);
+end
+end
+
+% calculate cell to nucleus area ratio, cell perimeter ratio, nucleus
+% perimeter ratio, nucleus circularity and cell circularity
+function [fMat, aCell, aNuc, pCell, pNuc] = binFeatures(I_c, I_n)
+N = length(I_c)/250;
+fMat = zeros(5,N);       
+for i = 1:N
+    imgCell = I_c(1+250*(i-1):250+250*(i-1),:);
+    imgNuc = I_n(1+250*(i-1):250+250*(i-1),:);
+    
+    aNuc(i) = sum(sum(imgNuc));                    % find area of cell
+    aCell(i) = sum(sum(imgCell));
+    aRatio = aNuc(i)/aCell(i);
+    
+    pCell_temp = regionprops(imgCell, 'perimeter');  % get perimeter
+    pCell(i) = sum(cat(1,pCell_temp.Perimeter));        % sum all the perimeters
+    pCellRatio = aCell(i)/pCell(i);                   % find ratio of area to perimeter
+    
+    pNuc_temp = regionprops(imgNuc, 'perimeter');
+    pNuc(i) = sum(cat(1,pNuc_temp.Perimeter));
+    pNucRatio = aNuc(i)/pNuc(i);                   % find ratio of area to perimeter
+    
+    cCell = 4*pi*aCell(i)/(pCell(i)^2);
+    cNuc = 4*pi*aNuc(i)/(pNuc(i)^2);
+    
+    fMat(1,i) = aRatio;
+    fMat(2,i) = pCellRatio;
+    fMat(3,i) = pNucRatio;
+    fMat(4,i) = cNuc;
+    fMat(5,i) = cCell;
+end  
+end
+</code><para id="delete_me">
+     <!-- Insert module text here -->
+  </para>
+</content>
+
+</document>

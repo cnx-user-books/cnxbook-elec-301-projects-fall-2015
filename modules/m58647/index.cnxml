@@ -1,0 +1,22 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>References</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58647</md:content-id>
+  <md:title>References</md:title>
+  <md:abstract/>
+  <md:uuid>f9911669-c019-4b32-a2e4-2027e4573947</md:uuid>
+</metadata>
+
+<content>
+  <para id="eip-815">1   Tierney, Stephen. "An Introduction to Matrix Completion." SJTRNY. N.p., 4 Apr. 2014. Web. 09 Dec. 2015.</para><para id="delete_me">2   Chi, Jocelyn T., and Eric C. Chi. "Getting to the Bottom of Matrix Completion and Nonnegative Least Squares with the MM Algorithm." Statistics Views. N.p.,
+       	31 Mar. 2014. Web. 09 Dec. 2015.
+</para><para id="eip-942">3   Cai, Tianxi, Tony T. Cai, and Anru Zhang. "Structured Matrix Completion with Applications to Genomic Data Integration." Stat.ME (2015): 1. 8 Apr. 2015. Web.
+       	9 Dec. 2015.
+</para><para id="eip-493">4   Liu, Zhang, and Lieven Vandenberghe. "Interior-point Method for Nuclear Norm Approximation with Application to System Identification." (n.d.): 1. University of
+      	California, Los Angeles. Web. 9 Dec. 2015.
+</para><para id="eip-784">5	Barzigar, Nafise. "Video Denoising with Matrix Completion." Homepage of Nafise Barzigar. N.p., Nov. 2012. Web. 09 Dec. 2015.
+</para><para id="eip-186">6	Candes, Emmanuel, and Benjamin Recht. "Exact Matrix Completion via Convex Optimization." (2008): n. pag. May 2008. Web. 9 Dec. 2015.<!-- Insert module text here -->
+  </para></content>
+
+</document>

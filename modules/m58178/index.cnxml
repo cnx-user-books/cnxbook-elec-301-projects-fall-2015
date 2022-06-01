@@ -1,0 +1,35 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Introduction</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58178</md:content-id>
+  <md:title>Introduction</md:title>
+  <md:abstract>Module for ELEC 301 project</md:abstract>
+  <md:uuid>6ce751a4-edf5-4993-82da-40a3ca78c748</md:uuid>
+</metadata>
+
+<content>
+  <section id="eip-773"><title>What is Matrix Completion</title><para id="eip-292">In 2006, Netflix issued a million dollar challenge to the world:
+</para><para id="eip-293"><emphasis>“Is there a computer algorithm that can accurately
+predict a user’s movie preferences?”
+</emphasis></para><para id="eip-294">In the contest, a data matrix was given that contained ratings of thousands of movies from thousands of examinees, but it was only 2% completed. Contestants for this Netflix Challenge had to complete the matrix and provide the optimal algorithms for the task. 
+</para><para id="eip-925">The Netflix Prize was won in 2009, but the ideas and algorithms generated to complete matrices remain vast and powerful in real world applications. Simply put, the Matrix Completion algorithm can be used for any areas that involve using a data matrix. 
+</para><para id="eip-212">From a more scientific perspective, the 2008 paper, Exact Matrix Completion via Convex Optimization by Candes and Recht formalized a majorization minimization algorithm for matrix completion. Eric Chi’s 2014 article Getting to the Bottom of Matrix Completion and Nonnegative Least Squares with the MM Algorithm provides a more grounded framework for the problem and explains the mathematical concepts behind matrix completion. 
+
+
+<media id="matrix" alt="Matrix Completion.">
+	   
+  <image mime-type="image/png" src="../../media/matrix completion.png"/>
+		 
+</media></para><para id="eip-791">A visual representation of matrix completion.</para><para id="eip-371">A visual representation of matrix completion.</para></section><section id="eip-453"><title>When Does Matrix Completion WOrk</title><para id="eip-22">Given a sparse matrix with movies along one axis and users along another, the algorithm had to predict how those users would rate movies they have not seen. The solution, known as Matrix Completion, provided a good estimate of sparse data, provided it satisfied the following:</para><list id="eip-127" list-type="enumerated" number-style="arabic"><item>The matrix must be low rank</item>
+<item>The unobserved indices in the matrix must be uniformly distributed
+</item></list><para id="eip-59">In terms of the Netflix Problem, the matrix was extremely sparse -- with millions of users and movies, less than 2% of the matrix was actually filled. The matrix also followed the above assumptions, specifically that there are a few “types” of people who watch Netflix (an action movie lover, a rom-com fanatic, etc.), making it low rank, and that each user’s reviews are spread uniformly throughout the matrix.
+</para></section><section id="eip-854"><title>Characterizing the Problem</title><para id="eip-342">Often, in the real world, these idealities are not upheld. It is very rare to find a matrix that is both perfectly uniform and low rank. In order to better understand matrix completions’ application to the real world, our project aimed to stretch the second requirement and better characterize the algorithm’s limits. 
+</para><para id="eip-759">Specifically, we decided to focus on the requirement that the unobserved indices in the matrix must be uniformly distributed. How uniform do the unobserved entries need to be? At what point does matrix completion “stop working”? 
+</para><para id="eip-70">Even more importantly, what does a plot of the error look like as a function of uniformity? We know that non-uniform data will result in a predicted matrix that is very dissimilar to the actual matrix, and we know that uniform data will result in a predicted matrix that very similar to the actual data, but what happens in between? Does a small amount of non-uniformity result in an unusable matrix, or can matrix completion continue to work under less than ideal conditions?
+</para></section><section id="eip-674"><title>Real World Implications</title><para id="eip-404">While it is important to characterize algorithms to have a better theoretical understanding of how and when they work, this research has very salient real world applications as well. 
+</para><para id="eip-204">Imagine an old picture with non-uniform noise distributed throughout it -- maybe one area of the photo is particularly noisy. If matrix completion can work in the conditions described previously, it would be able to reconstruct those images. 
+</para><para id="eip-88">Even more importantly, matrix completion is used to predict cancer survival rates, among other medical applications. There is no guarantee that this data is uniform, but maybe matrix completion can still be trusted in these situations despite this limitation. 
+</para></section></content>
+
+</document>

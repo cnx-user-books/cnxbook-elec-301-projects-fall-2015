@@ -1,0 +1,43 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Classification</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58628</md:content-id>
+  <md:title>Classification</md:title>
+  <md:abstract/>
+  <md:uuid>e6035df6-e0a9-45cf-84ef-ea5d104375a2</md:uuid>
+</metadata>
+
+<content>
+  <section id="eip-936"><title>SVM</title><para id="eip-570">SVM involves three phases: a training phase, cross-validation phase, and testing phase. The training phase learns a model by which to classify new test examples. The cross-validation phase is used to choose parameters of the classifier that will result in the highest accuracy of the classifier.[1] The test phase applies the model with the chosen parameters to classify the test examples. The 150 images of our dataset were divided into 60% training examples, 20% cross-validation examples, and 20% test examples. 
+</para><para id="eip-665"><title>Training Phase</title>The training phase takes two inputs: a feature matrix containing the values of each of the 12 features for each training example, and a label vector containing an integer representing which of the 5 classes each training example belongs to. Each training example exists at a particular location in the 12-dimensional “feature space.” The algorithm learns a model of boundaries that best separates the 5 classes of training examples in this feature space. The boundaries that are selected are the ones with the largest margin between training examples of differing classes. An example of a boundary learned for a two-dimensional feature space is shown in the figure below.</para><para id="eip-534"><media id="svm" alt="SVM Classifier.">
+	   
+  <image mime-type="image/gif" src="../../media/SVM classifier.gif"/>
+		 
+</media></para><para id="eip-538">Figure 1. SVM classifier. [2]</para><para id="eip-992"><title>Cross-validation Phase</title>SVM has two parameters, C and gamma, that control how smooth the separation boundaries are. C and gamma must be chosen to best prevent overfitting and underfitting of the model. In the cross-validation phase, training of the model is repeated for different combinations of C and gamma. The model is then applied to a cross-validation data set and the classification accuracy of each model is calculated. The values of C and gamma that result in the highest accuracy are selected.</para><para id="eip-418"><title>Test Phase</title>In the test phase, the SVM algorithm uses the boundary learned in the training phase to classify new test examples. The input to the test phase is the model from the training phase and the feature matrix for the test examples. The output of the test phase is the predicted class for each test example. The predicted values of the test examples can be compared to the actual values to calculate accuracy of the classifier.</para><para id="eip-931"><title>Multiclass Classification Methods</title>Two methods of multiclass SVM classification were implemented: 1 vs 1 and 1 vs all.</para><para id="eip-142">In the training phase of 1 vs 1 classification, a binary classifier is trained for each pair of classes. For example, one of the classifiers would classify all Class I examples as positive examples and all Class 2 examples as negative examples. During the test phase, each of these classifiers is applied to the test data. For each training example, the class that gets the greatest number of positive classifications is chosen as the predicted class.</para><para id="eip-377">In the training phase of 1 vs all classification, a single classifier is trained for each of the classes. For example, one of the classifiers would classify all Class I examples as positive examples and all other examples as negative examples. During the test phase, the classifiers are applied to the test data. A single positive class is returned for each training example and is chosen as the predicted class for that example.</para></section><section id="eip-292"><title>Neural Network</title><para id="eip-838">We used the Pattern Recognition tool in MATLAB R2014a  (nprtool) to generate a neural network for our feature and target matrices. [3] The work flow for the general neural network design process has seven primary steps: 
+</para><list id="eip-851" list-type="enumerated" number-style="arabic"><item>Collect data</item>
+<item>Create the network</item>
+<item>Configure the network
+</item>
+<item>Initialize the weights and biases
+</item>
+<item>Train the network
+</item>
+<item>Validate the network (post-training analysis)
+</item>
+<item>Use the network 
+</item></list><para id="eip-79">We used the MATLAB defaults for weights and biases, and tested multiple numbers of hidden layers. 20 hidden layers gave us the best testing results.</para><para id="eip-856"><title>Architecture</title>A neural network is composed of multiple layers of neuron models. These neurons can have multiple weighted inputs. An example neuron with R inputs is shown below in Figure 2. Each input is weighted (initially random pre-training) and the sum of the weighted inputs and the bias forms the input to the transfer function f. These weights and biases are adjusted during training [4]. </para><para id="eip-844"><media id="neuron" alt="general neuron.">
+	   
+  <image mime-type="image/png" src="../../media/general neuron.png"/>
+		 
+</media></para><para id="eip-159">Figure 2. General neuron model.</para><para id="eip-564">The neurons then use a differentiable transfer function f to generate their output. Tangent sigmoid output neurons are generally used for pattern recognition problems. Since our neural network had a hidden layer of 20 neurons, a tan-sigmoid transfer function was used for the hidden neurons.
+</para><para id="eip-654"><media id="NNblock" alt="Neural Network Block Diagram.">
+	   
+  <image mime-type="image/png" src="../../media/NNBlock.png"/>
+		 
+</media></para><para id="eip-127">Figure 3. Our output neural network.</para><para id="eip-63"><title>Back-Propagation Training</title></para><para id="eip-526">This type of neural network architecture is called a feedforward network. They often have hidden layers of sigmoid neurons followed by an output layer of linear neurons. We train using a method called back-propagation. Back-propagation is commonly used in image processing applications because the problem is extremely complex (many features) but has a clear solution (certain number of classes).</para><para id="eip-994">Back-propagation works in small iterative steps. The input matrix is applied to the network, and the network produces an initial output based on the current state of it's synaptic weights (before training the output will be random since these weights are random). This output is compared to the target matrix, and a mean-squared error signal is calculated. [5]</para><para id="eip-358">The error value is propagated backwards through the network and small changes are made to the weights in each layer to reduce this error. The whole process is repeated for each training image (9 for each class), then back to the first case. This process is iterated until the error no longer changes.</para><para id="eip-138"><title>Testing</title>The inputs to the neural network are the feature matrix and the target matrix. The feature matrix used for the neural network is the same used for SVM. This matrix is 150 samples by 12 elements (150 images, 12 features). The target matrix is used to identify the correct class of each image. This matrix is 150 samples by 5 elements (150 images, 5 classes). To construct this matrix, we simply coded a 1 in the column of the corresponding class for each image and a 0 in every other column. </para><para id="eip-621">We used nprtool to automatically separate the input matrix into the training (60%), validation (20%), and test (20%) matrices. These percentages are consistent with the SVM method.</para><para id="eip-134">After the data is loaded, MATLAB generates a neural network with our specifications (20 hidden layers, back propagation training). We trained the network and output the confusion matrices and receiver operating characteristic (ROC) curves. The confusion matrices show the results of the neural network for the training, validation, and testing phases and the ROC curve plots the true positive rate vs. false positive rate. </para></section><para id="delete_me">
+     <!-- Insert module text here -->
+  </para>
+</content>
+
+</document>

@@ -1,0 +1,24 @@
+<document xmlns="http://cnx.rice.edu/cnxml">
+
+<title>Segmentation</title>
+<metadata xmlns:md="http://cnx.rice.edu/mdml">
+  <md:content-id>m58627</md:content-id>
+  <md:title>Segmentation</md:title>
+  <md:abstract/>
+  <md:uuid>203dacf8-fbb3-4990-b8f0-afa5fec7b27f</md:uuid>
+</metadata>
+
+<content>
+  <para id="delete_me"><figure id="seg">
+  <title>Segmentation Block Diagram</title>
+  <media id="segbd" alt="segmentation">
+    <image mime-type="image/png" src="../../media/elec block diagram.png"/>
+  </media>
+</figure></para><para id="eip-631"><title>Green Channel Isolation</title>As all images were in RGB format, green channel isolation simply involved taking the green layer of the matrix containing the image, returning a grayscale image based on the green intensity of the original image. Recall that this was done to match the white blood cell stains.</para><para id="eip-510"><title>Thresholding</title>Thresholding was performed on the grayscale images with MATLAB's multithresh function using Otsu's method, separating the image with 5 different thresholds into 6 different levels. The 2nd most exclusive threshold was used to select nuclei, and the 4th most exclusive threshold was used to select cell bodies, returning two rough binary masks.</para><para id="eip-850"><title>Cleaning</title>These rough masks were then processed to remove debris, fill holes, and smooth edges. 
+<list id="cleanlist">
+<item>Debris was removed by deleting all objects with a centroid within a fixed distance from the margins or smaller than a fixed number of pixels. The objects and their centroids were found using MATLAB's regionprops function.</item>
+<item>Holes were filled using MATLAB's imfill function and imclose function.</item>
+<item>Since debris overlapping with the cell or nucleus of interest were not removed with the previous debris clearing function, a binary erosion was performed on the mask, the debris clearing function was repeated, and a binary dilation was performed on the mask, using MATLAB's imerode and imdilate functions, respectively. This erosion and dilation was also used to smooth the mask's edges. In future iterations, the hole filling function imclose might be moved after this second debris clearing function, as imclose might interfere with imerode's ability to separate overlapping objects.</item>
+</list></para><para id="eip-835"><title>Masking</title>Finally, the binary mask was applied to the grayscale image in an element-wise matrix multiplication, returning a grayscale image of just the cell or nucleus in question.</para></content>
+
+</document>
