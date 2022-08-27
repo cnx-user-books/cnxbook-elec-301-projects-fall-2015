@@ -1,574 +1,156 @@
-<col:collection xmlns="http://cnx.rice.edu/collxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:col="http://cnx.rice.edu/collxml" xml:lang="en">
+<?xml version="1.0"?>
+<col:collection xmlns="http://cnx.rice.edu/collxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:col="http://cnx.rice.edu/collxml" xml:lang="en" authors="Rice University ELEC 301">
   <metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
-  <md:content-id>col11950</md:content-id>
-  <md:title>ELEC 301 Projects Fall 2015</md:title>
-  
-  
-  <md:license url="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution License 4.0</md:license>
-  <md:language>en</md:language>
-
-  
-
-  
-  
-  
-  
-  
-
-  <md:uuid>fb950aff-496b-45f4-96ec-4ae340e1b237</md:uuid>
-<md:slug>elec-301-projects-fall-2015</md:slug>
-</metadata>
-
+    <md:content-id>col11950</md:content-id>
+    <md:title>ELEC 301 Projects Fall 2015</md:title>
+    <md:license url="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution License 4.0</md:license>
+    <md:language>en</md:language>
+    <md:uuid>fb950aff-496b-45f4-96ec-4ae340e1b237</md:uuid>
+    <md:slug>elec-301-projects-fall-2015</md:slug>
+  </metadata>
   <col:content>
-    
-      
-        
-      <col:subcollection>
-        <md:title>1-D Motion Image Deblurring with Flutter Shutter</md:title>
-        
-        
-        
-
-        <col:content>
-          
-    
-      <col:module document="m58559"/>
-        
-      
-    
-    
-      <col:module document="m58567"/>
-        
-      
-    
-    
-      <col:module document="m58651"/>
-        
-      
-    
-    
-      <col:module document="m58657"/>
-        
-      
-    
-    
-      <col:module document="m58589"/>
-        
-      
-    
-    
-      <col:module document="m58659"/>
-        
-      
-    
-    
-      <col:module document="m58660"/>
-        
-      
-    
-    
-      <col:module document="m58696"/>
-        
-      
-    
-    
-      <col:module document="m58697"/>
-        
-      
-    
-    
-      <col:module document="m58698"/>
-        
-      
-    
-    
-      <col:module document="m58699"/>
-        
-      
-    
-        </col:content>
-      </col:subcollection>
-    
-    
-      
-        
-      <col:subcollection>
-        <md:title>Accent Classification using Scattering Coefficients</md:title>
-        
-        
-        
-
-        <col:content>
-          
-    
-      <col:module document="m58700"/>
-        
-      
-    
-    
-      <col:module document="m58704"/>
-        
-      
-    
-    
-      <col:module document="m58717"/>
-        
-      
-    
-    
-      <col:module document="m58779"/>
-        
-      
-    
-    
-      <col:module document="m58718"/>
-        
-      
-    
-    
-      <col:module document="m58705"/>
-        
-      
-    
-        </col:content>
-      </col:subcollection>
-    
-    
-      
-        
-      <col:subcollection>
-        <md:title>Automatic White Blood Cell Classification using SVM and Neural Networks</md:title>
-        
-        
-        
-
-        <col:content>
-          
-    
-      
-        
-      <col:subcollection>
-        <md:title>Introduction</md:title>
-        
-        
-        
-
-        <col:content>
-          
-    
-      <col:module document="m58266"/>
-        
-      
-    
-    
-      <col:module document="m58265"/>
-        
-      
-    
-        </col:content>
-      </col:subcollection>
-    
-    
-      
-        
-      <col:subcollection>
-        <md:title>Our Approach</md:title>
-        
-        
-        
-
-        <col:content>
-          
-    
-      <col:module document="m58267"/>
-        
-      
-    
-    
-      <col:module document="m58625"/>
-        
-      
-    
-        </col:content>
-      </col:subcollection>
-    
-    
-      
-        
-      <col:subcollection>
-        <md:title>Implementation</md:title>
-        
-        
-        
-
-        <col:content>
-          
-    
-      <col:module document="m58627"/>
-        
-      
-    
-    
-      <col:module document="m58691"/>
-        
-      
-    
-    
-      <col:module document="m58628"/>
-        
-      
-    
-        </col:content>
-      </col:subcollection>
-    
-    
-      
-        
-      <col:subcollection>
-        <md:title>Data Analysis and Discussion</md:title>
-        
-        
-        
-
-        <col:content>
-          
-    
-      <col:module document="m58630"/>
-        
-      
-    
-    
-      <col:module document="m58632"/>
-        
-      
-    
-        </col:content>
-      </col:subcollection>
-    
-    
-      
-        
-      <col:subcollection>
-        <md:title>Code</md:title>
-        
-        
-        
-
-        <col:content>
-          
-    
-      <col:module document="m58634"/>
-        
-      
-    
-    
-      <col:module document="m58635"/>
-        
-      
-    
-        </col:content>
-      </col:subcollection>
-    
-    
-      <col:module document="m58636"/>
-        
-      
-    
-    
-      <col:module document="m58637"/>
-        
-      
-    
-    
-      <col:module document="m58638"/>
-        
-      
-    
-        </col:content>
-      </col:subcollection>
-    
-    
-      
-        
-      <col:subcollection>
-        <md:title>Breaking Matrix Completion: A Stress Test</md:title>
-        
-        
-        
-
-        <col:content>
-          
-    
-      <col:module document="m58178"/>
-        
-      
-    
-    
-      <col:module document="m58649"/>
-        
-      
-    
-    
-      <col:module document="m58645"/>
-        
-      
-    
-    
-      <col:module document="m58642"/>
-        
-      
-    
-    
-      <col:module document="m58648"/>
-        
-      
-    
-    
-      <col:module document="m58647"/>
-        
-      
-    
-    
-      <col:module document="m58650"/>
-        
-      
-    
-        </col:content>
-      </col:subcollection>
-    
-    
-      
-        
-      <col:subcollection>
-        <md:title>GPU Acceleration of Edge-Based Motion Detection and Machine Learning-Aided Facial Recognition with NVIDIA CUDA</md:title>
-        
-        
-        
-
-        <col:content>
-          
-    
-      <col:module document="m58206"/>
-        
-      
-    
-        </col:content>
-      </col:subcollection>
-    
-    
-      
-        
-      <col:subcollection>
-        <md:title>Handwritten Digit Recognition Using Convolutional Neural Networks</md:title>
-        
-        
-        
-
-        <col:content>
-          
-    
-      <col:module document="m58168"/>
-        
-      
-    
-    
-      <col:module document="m58670"/>
-        
-      
-    
-    
-      <col:module document="m58666"/>
-        
-      
-    
-    
-      <col:module document="m58667"/>
-        
-      
-    
-    
-      <col:module document="m58669"/>
-        
-      
-    
-    
-      <col:module document="m58672"/>
-        
-      
-    
-    
-      <col:module document="m58677"/>
-        
-      
-    
-    
-      <col:module document="m58682"/>
-        
-      
-    
-        </col:content>
-      </col:subcollection>
-    
-    
-      
-        
-      <col:subcollection>
-        <md:title>Harmonizing Guitar Pre-amp</md:title>
-        
-        
-        
-
-        <col:content>
-          
-    
-      <col:module document="m58597"/>
-        
-      
-    
-    
-      <col:module document="m58639"/>
-        
-      
-    
-    
-      <col:module document="m58665"/>
-        
-      
-    
-    
-      <col:module document="m58640"/>
-        
-      
-    
-    
-      <col:module document="m58518"/>
-        
-      
-    
-    
-      <col:module document="m58621"/>
-        
-      
-    
-        </col:content>
-      </col:subcollection>
-    
-    
-      
-        
-      <col:subcollection>
-        <md:title>Hough Transform Object Detection</md:title>
-        
-        
-        
-
-        <col:content>
-          
-    
-      <col:module document="m58716"/>
-        
-      
-    
-    
-      <col:module document="m58714"/>
-        
-      
-    
-    
-      <col:module document="m58711"/>
-        
-      
-    
-    
-      <col:module document="m58710"/>
-        
-      
-    
-        </col:content>
-      </col:subcollection>
-    
-    
-      
-        
-      <col:subcollection>
-        <md:title>Implementation of Digital Communication through Audio Signals</md:title>
-        
-        
-        
-
-        <col:content>
-          
-    
-      <col:module document="m58674"/>
-        
-      
-    
-    
-      <col:module document="m58679"/>
-        
-      
-    
-    
-      <col:module document="m58680"/>
-        
-      
-    
-    
-      <col:module document="m58684"/>
-        
-      
-    
-    
-      <col:module document="m58686"/>
-        
-      
-    
-    
-      <col:module document="m58688"/>
-        
-      
-    
-    
-      <col:module document="m58687"/>
-        
-      
-    
-    
-      <col:module document="m58689"/>
-        
-      
-    
-    
-      <col:module document="m58690"/>
-        
-      
-    
-    
-      <col:module document="m58695"/>
-        
-      
-    
-        </col:content>
-      </col:subcollection>
-    
-    
-      
-        
-      <col:subcollection>
-        <md:title>Using Image Signal Processing in Determining the Optimal Jumping Shots</md:title>
-        
-        
-        
-
-        <col:content>
-          
-    
-      <col:module document="m58218"/>
-        
-      
-    
-        </col:content>
-      </col:subcollection>
-    
+    <col:subcollection>
+      <md:title>1-D Motion Image Deblurring with Flutter Shutter</md:title>
+      <col:content>
+        <col:module document="m58559"/>
+        <col:module document="m58567"/>
+        <col:module document="m58651"/>
+        <col:module document="m58657"/>
+        <col:module document="m58589"/>
+        <col:module document="m58659"/>
+        <col:module document="m58660"/>
+        <col:module document="m58696"/>
+        <col:module document="m58697"/>
+        <col:module document="m58698"/>
+        <col:module document="m58699"/>
+      </col:content>
+    </col:subcollection>
+    <col:subcollection>
+      <md:title>Accent Classification using Scattering Coefficients</md:title>
+      <col:content>
+        <col:module document="m58700"/>
+        <col:module document="m58704"/>
+        <col:module document="m58717"/>
+        <col:module document="m58779"/>
+        <col:module document="m58718"/>
+        <col:module document="m58705"/>
+      </col:content>
+    </col:subcollection>
+    <col:subcollection>
+      <md:title>Automatic White Blood Cell Classification using SVM and Neural Networks</md:title>
+      <col:content>
+        <col:subcollection>
+          <md:title>Introduction</md:title>
+          <col:content>
+            <col:module document="m58266"/>
+            <col:module document="m58265"/>
+          </col:content>
+        </col:subcollection>
+        <col:subcollection>
+          <md:title>Our Approach</md:title>
+          <col:content>
+            <col:module document="m58267"/>
+            <col:module document="m58625"/>
+          </col:content>
+        </col:subcollection>
+        <col:subcollection>
+          <md:title>Implementation</md:title>
+          <col:content>
+            <col:module document="m58627"/>
+            <col:module document="m58691"/>
+            <col:module document="m58628"/>
+          </col:content>
+        </col:subcollection>
+        <col:subcollection>
+          <md:title>Data Analysis and Discussion</md:title>
+          <col:content>
+            <col:module document="m58630"/>
+            <col:module document="m58632"/>
+          </col:content>
+        </col:subcollection>
+        <col:subcollection>
+          <md:title>Code</md:title>
+          <col:content>
+            <col:module document="m58634"/>
+            <col:module document="m58635"/>
+          </col:content>
+        </col:subcollection>
+        <col:module document="m58636"/>
+        <col:module document="m58637"/>
+        <col:module document="m58638"/>
+      </col:content>
+    </col:subcollection>
+    <col:subcollection>
+      <md:title>Breaking Matrix Completion: A Stress Test</md:title>
+      <col:content>
+        <col:module document="m58178"/>
+        <col:module document="m58649"/>
+        <col:module document="m58645"/>
+        <col:module document="m58642"/>
+        <col:module document="m58648"/>
+        <col:module document="m58647"/>
+        <col:module document="m58650"/>
+      </col:content>
+    </col:subcollection>
+    <col:subcollection>
+      <md:title>GPU Acceleration of Edge-Based Motion Detection and Machine Learning-Aided Facial Recognition with NVIDIA CUDA</md:title>
+      <col:content>
+        <col:module document="m58206"/>
+      </col:content>
+    </col:subcollection>
+    <col:subcollection>
+      <md:title>Handwritten Digit Recognition Using Convolutional Neural Networks</md:title>
+      <col:content>
+        <col:module document="m58168"/>
+        <col:module document="m58670"/>
+        <col:module document="m58666"/>
+        <col:module document="m58667"/>
+        <col:module document="m58669"/>
+        <col:module document="m58672"/>
+        <col:module document="m58677"/>
+        <col:module document="m58682"/>
+      </col:content>
+    </col:subcollection>
+    <col:subcollection>
+      <md:title>Harmonizing Guitar Pre-amp</md:title>
+      <col:content>
+        <col:module document="m58597"/>
+        <col:module document="m58639"/>
+        <col:module document="m58665"/>
+        <col:module document="m58640"/>
+        <col:module document="m58518"/>
+        <col:module document="m58621"/>
+      </col:content>
+    </col:subcollection>
+    <col:subcollection>
+      <md:title>Hough Transform Object Detection</md:title>
+      <col:content>
+        <col:module document="m58716"/>
+        <col:module document="m58714"/>
+        <col:module document="m58711"/>
+        <col:module document="m58710"/>
+      </col:content>
+    </col:subcollection>
+    <col:subcollection>
+      <md:title>Implementation of Digital Communication through Audio Signals</md:title>
+      <col:content>
+        <col:module document="m58674"/>
+        <col:module document="m58679"/>
+        <col:module document="m58680"/>
+        <col:module document="m58684"/>
+        <col:module document="m58686"/>
+        <col:module document="m58688"/>
+        <col:module document="m58687"/>
+        <col:module document="m58689"/>
+        <col:module document="m58690"/>
+        <col:module document="m58695"/>
+      </col:content>
+    </col:subcollection>
+    <col:subcollection>
+      <md:title>Using Image Signal Processing in Determining the Optimal Jumping Shots</md:title>
+      <col:content>
+        <col:module document="m58218"/>
+      </col:content>
+    </col:subcollection>
   </col:content>
 </col:collection>
